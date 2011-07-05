@@ -17,4 +17,13 @@
 # Authors : See https://github.com/organizations/ubuntu-gr/teams/69867 for the list of authors.
 # Version : 0.1
 
+RADIOLIST = 'radiolist.txt'
+
+class PlaylistGenerator:
+    def __init__(self):
+        print "In the playlist generator"
+
+
+if __name__ == '__main__':
+    playlist = PlaylistGenerator()
 
