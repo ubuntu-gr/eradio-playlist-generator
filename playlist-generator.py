@@ -25,7 +25,8 @@ class PlaylistGenerator:
     def __init__(self):
         fd = codecs.open(RADIOLIST, 'r', 'iso-8859-7')
         for line in fd.readlines():
-            print line
+            if line[:3] != 'var' and line[:2] != '];':
+                print line
 
 
 if __name__ == '__main__':
