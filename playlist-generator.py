@@ -17,11 +17,15 @@
 # Authors : See https://github.com/organizations/ubuntu-gr/teams/69867 for the list of authors.
 # Version : 0.1
 
-RADIOLIST = 'radiolist.txt'
+import codecs   # open()
+
+RADIOLIST = 'radiolist.js'
 
 class PlaylistGenerator:
     def __init__(self):
-        print "In the playlist generator"
+        fd = codecs.open(RADIOLIST, 'r', 'iso-8859-7')
+        for line in fd.readlines():
+            print line
 
 
 if __name__ == '__main__':
