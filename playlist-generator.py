@@ -76,7 +76,7 @@ class PlaylistGenerator(object):
             s += "File%d=%s\n" % (index, index)          # TODO put real url
             s += "Title%d=%s\n" % (index, station.title)
             s += "Length=-1\n\n"
-        s += "Numberofentries=%d\n\n" % ns
+        s += "NumberofEntries=%d\n\n" % ns
         s += "Version=2"
         with codecs.open(PLS_FNAME, mode="w", encoding="utf-8") as f:
             f.write(s)
