@@ -37,7 +37,7 @@ class PlaylistGenerator(object):
         self.get_stations()
 
     def get_stations(self):
-        with codecs.open(RADIOLIST, 'r', 'iso-8859-7') as f:
+        with codecs.open(RADIOLIST, 'r', 'utf-8') as f:
             text = f.readlines()              # Create a list with the lines
             text = text[1:-1]                 # Remove first and last lines
             text[-1] += ","                   # Add a comma at the last entry
