@@ -21,9 +21,11 @@
 from __future__ import print_function
 import codecs
 import re
-from collections  import namedtuple
+from collections import namedtuple
+import urllib
 
 # Constants
+URL_RADIOLIST = "http://www.e-radio.gr/cache/mediadata_1.js"
 RADIOLIST = 'radiolist.js'
 REGEX_PATTERN = r'(mediatitle): (".*?").*?(city): (".*?").*?(mediaid): (\d+).*?(logo): (".*?")'
 
@@ -34,6 +36,8 @@ class PlaylistGenerator(object):
         super(PlaylistGenerator, self).__init__()
 
         self.stations = []
+        # Not required for now, radiolist.js is up-to-date.
+        #self.get_radiolist()
         self.get_stations()
 
     def get_stations(self):
@@ -51,9 +55,17 @@ class PlaylistGenerator(object):
         for md in self.stations:
             print(u"Τίτλος : {0}\nΠόλη : {1}\nId : {2}\nLogo : {3}\n".format(
                 md.title, md.city, md.id, md.logo))
+    
+    def get_radiolist(self):
+        f = urllib.urlopen(URL_RADIOLIST)
+        result1 = f.read().replace("\r", "\n") # Strip \r characters
+        result2 = unicode(result1, "iso-8859-7")
+        #list = result2.split("\n")
+        o = codecs.open(RADIOLIST, mode="w", encoding="utf-8")
+        o.write(result2)
+        o.close()
 
 if __name__ == '__main__':
     playlist = PlaylistGenerator()
     playlist.print_stations()
-
 
