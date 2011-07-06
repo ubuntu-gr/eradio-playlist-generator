@@ -53,11 +53,12 @@ class PlaylistGenerator(object):
                         'city': u'\u03a3\u0395\u03a1\u03a1\u0395\u03a3'
                     }
                     """
+
     def print_stations(self):
         for md in self.stations:
             print(u"Τίτλος : {0}\nΠόλη : {1}\nId : {2}\nLogo : {3}\n".format(
                 md['title'], md['city'], md['id'], md['logo']))
-    
+
     def get_radiolist(self):
         link = urllib.urlopen(self.url_rlist)
         result1 = link.read().replace("\r", "\n") # Strip \r characters
