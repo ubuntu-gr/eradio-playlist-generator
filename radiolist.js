@@ -11,6 +11,7 @@ var mediadata = [
 { mediatitle: "Act Radio ", city: "INTERNET RADIO", mediaid: 1884, logo: "/logos/gr/mini/actradiogr.gif" }, 
 { mediatitle: "Action Radio Κόνιτσα 98,2", city: "ΚΟΝΙΤΣΑ", mediaid: 871, logo: "/logos/gr/mini/actionradio.gif" }, 
 { mediatitle: "Active Radio ", city: "INTERNET RADIO", mediaid: 48, logo: "/logos/gr/mini/activeradio.gif" }, 
+{ mediatitle: "Akous. Breeze ", city: "ΑΘΗΝΑ", mediaid: 1709, logo: "/logos/gr/mini/akous_breeze.gif" }, 
 { mediatitle: "Akous. Edgar's Stage ", city: "ΑΘΗΝΑ", mediaid: 1707, logo: "/logos/gr/mini/akousstage_edgar.gif" }, 
 { mediatitle: "Akous. Gazi ", city: "ΑΘΗΝΑ", mediaid: 1706, logo: "/logos/gr/mini/akous_gazi.gif" }, 
 { mediatitle: "Akous. InLove ", city: "ΑΘΗΝΑ", mediaid: 1839, logo: "/logos/gr/mini/akous_inlove.gif" }, 

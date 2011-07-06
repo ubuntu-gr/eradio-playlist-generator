@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+# Copyright (c) 2011 ubuntu-gr github team
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -21,49 +23,48 @@
 from __future__ import print_function
 import codecs
 import re
-from collections import namedtuple
 import urllib
-
-# Constants
-URL_RADIOLIST = "http://www.e-radio.gr/cache/mediadata_1.js"
-RADIOLIST = 'radiolist.js'
-REGEX_PATTERN = r'(mediatitle): (".*?").*?(city): (".*?").*?(mediaid): (\d+).*?(logo): (".*?")'
-
-MediaData = namedtuple('MediaData', ['title','city', 'id', 'logo'])
 
 class PlaylistGenerator(object):
     def __init__(self):
         super(PlaylistGenerator, self).__init__()
-
+        self.url_rlist = "http://www.e-radio.gr/cache/mediadata_1.js"
+        self.file_rlist = 'radiolist.js'
         self.stations = []
         # Not required for now, radiolist.js is up-to-date.
         #self.get_radiolist()
         self.get_stations()
 
     def get_stations(self):
-        with codecs.open(RADIOLIST, 'r', 'utf-8') as f:
-            text = f.readlines()              # Create a list with the lines
-            text = text[1:-1]                 # Remove first and last lines
-            text[-1] += ","                   # Add a comma at the last entry
-
+        # { mediatitle: "Άλφα Radio 96", city: "ΣΕΡΡΕΣ", mediaid: 1197, logo: "/logos/gr/mini/nologo.gif" }, 
+        rxstr = r'mediatitle: "(?P<title>[^"]*)", city: "(?P<city>[^"]*)", mediaid: (?P<id>\d+), logo: "(?P<logo>[^"]*)"'
+        rx = re.compile(rxstr)
+        with codecs.open(self.file_rlist, 'r', 'utf-8') as f:
+            text = f.readlines()
             for line in text:
-                line = line[2:-4]             # clean-up each line
-                fields = re.search(REGEX_PATTERN, line)
-                self.stations.append(MediaData(fields.group(2), fields.group(4),
-                                               fields.group(6), fields.group(8)))
+                match = rx.search(line)
+                if match:
+                    self.stations.append(match.groupdict())
+                    """ match.groupdict() example:
+                    {
+                        'logo': u'/logos/gr/mini/nologo.gif',
+                        'title': u'\u0386\u03bb\u03c6\u03b1 Radio 96',
+                        'id': u'1197',
+                        'city': u'\u03a3\u0395\u03a1\u03a1\u0395\u03a3'
+                    }
+                    """
     def print_stations(self):
         for md in self.stations:
             print(u"Τίτλος : {0}\nΠόλη : {1}\nId : {2}\nLogo : {3}\n".format(
-                md.title, md.city, md.id, md.logo))
+                md['title'], md['city'], md['id'], md['logo']))
     
     def get_radiolist(self):
-        f = urllib.urlopen(URL_RADIOLIST)
-        result1 = f.read().replace("\r", "\n") # Strip \r characters
+        link = urllib.urlopen(self.url_rlist)
+        result1 = link.read().replace("\r", "\n") # Strip \r characters
         result2 = unicode(result1, "iso-8859-7")
         #list = result2.split("\n")
-        o = codecs.open(RADIOLIST, mode="w", encoding="utf-8")
-        o.write(result2)
-        o.close()
+        with codecs.open(self.file_rlist, mode="w", encoding="utf-8") as f:
+            f.write(result2)
 
 if __name__ == '__main__':
     playlist = PlaylistGenerator()
