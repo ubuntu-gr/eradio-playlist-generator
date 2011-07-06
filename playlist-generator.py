@@ -17,18 +17,43 @@
 # Authors : See https://github.com/organizations/ubuntu-gr/teams/69867 for the list of authors.
 # Version : 0.1
 
-import codecs   # open()
+# Imports
+from __future__ import print_function
+import codecs
+import re
+from collections  import namedtuple
 
+# Constants
 RADIOLIST = 'radiolist.js'
+REGEX_PATTERN = r'(mediatitle): (".*?").*?(city): (".*?").*?(mediaid): (\d+).*?(logo): (".*?")'
 
-class PlaylistGenerator:
+MediaData = namedtuple('MediaData', ['title','city', 'id', 'logo'])
+
+class PlaylistGenerator(object):
     def __init__(self):
-        fd = codecs.open(RADIOLIST, 'r', 'iso-8859-7')
-        for line in fd.readlines():
-            if line[:3] != 'var' and line[:2] != '];':
-                print line
+        super(PlaylistGenerator, self).__init__()
 
+        self.stations = []
+        self.get_stations()
+
+    def get_stations(self):
+        with codecs.open(RADIOLIST, 'r', 'iso-8859-7') as f:
+            text = f.readlines()              # Create a list with the lines
+            text = text[1:-1]                 # Remove first and last lines
+            text[-1] += ","                   # Add a comma at the last entry
+
+            for line in text:
+                line = line[2:-4]             # clean-up each line
+                fields = re.search(REGEX_PATTERN, line)
+                self.stations.append(MediaData(fields.group(2), fields.group(4),
+                                               fields.group(6), fields.group(8)))
+    def print_stations(self):
+        for md in self.stations:
+            print(u"Τίτλος : {0}\nΠόλη : {1}\nId : {2}\nLogo : {3}\n".format(
+                md.title, md.city, md.id, md.logo))
 
 if __name__ == '__main__':
     playlist = PlaylistGenerator()
+    playlist.print_stations()
+
 
