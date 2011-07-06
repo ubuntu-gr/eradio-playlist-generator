@@ -61,10 +61,10 @@ class PlaylistGenerator(object):
                 md['title'], md['city'], md['id'], md['logo']))
 
     def get_radiolist(self):
-        f = urllib.urlopen(URL_RADIOLIST)
+        f = urllib.urlopen(self.url_rlist)
         text = f.read().replace("\r", "\n") # Strip \r characters
         utext = unicode(text, "iso-8859-7")
-        with codecs.open(RADIOLIST, mode="w", encoding="utf-8") as f:
+        with codecs.open(self.file_rlist, mode="w", encoding="utf-8") as f:
             f.write(utext)
 
     def make_pls(self):
