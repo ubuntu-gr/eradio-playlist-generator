@@ -30,6 +30,7 @@ class PlaylistGenerator(object):
         super(PlaylistGenerator, self).__init__()
         self.url_rlist = "http://www.e-radio.gr/cache/mediadata_1.js"
         self.file_rlist = 'radiolist.js'
+		self.file_pls = 'playlist.pls'
         self.stations = []
         # Not required for now, radiolist.js is up-to-date.
         #self.get_radiolist()
@@ -67,7 +68,32 @@ class PlaylistGenerator(object):
         with codecs.open(self.file_rlist, mode="w", encoding="utf-8") as f:
             f.write(result2)
 
+    def get_radiolist(self):
+        f = urllib.urlopen(URL_RADIOLIST)
+        text = f.read().replace("\r", "\n") # Strip \r characters
+        utext = unicode(text, "iso-8859-7")
+        with codecs.open(RADIOLIST, mode="w", encoding="utf-8") as f:
+            f.write(utext)
+
+    def make_pls(self):
+        """
+        Create a *.pls file.
+        http://en.wikipedia.org/wiki/PLS_%28file_format%29
+        """
+        ns = len(self.stations)
+        s = u""
+        s += "[playlist]\n\n"
+        for index, station in enumerate(self.stations):
+            s += "File%d=%s\n" % (index, index)          # TODO put real url
+            s += "Title%d=%s\n" % (index, station.title)
+            s += "Length=-1\n\n"
+        s += "NumberofEntries=%d\n\n" % ns
+        s += "Version=2"
+        with codecs.open(PLS_FNAME, mode="w", encoding="utf-8") as f:
+            f.write(s)
+        print(s)
+
 if __name__ == '__main__':
     playlist = PlaylistGenerator()
     playlist.print_stations()
-
+    playlist.make_pls()
