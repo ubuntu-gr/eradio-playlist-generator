@@ -27,6 +27,9 @@ import urllib
 
 from HTMLParser import HTMLParser
 
+# Για τις δοκιμές κάνουμε λήψη 3 σελίδων μόνο. Στην πλήρη έκδοση το αφαιρούμε.
+TESTCOUNT = 3
+
 class Spider(HTMLParser):
     def __init__(self, url):
         HTMLParser.__init__(self)
@@ -49,8 +52,7 @@ class PlaylistGenerator(object):
         self.file_rlist = 'radiolist.js'
         self.file_pls = 'playlist.pls'
         self.file_xspf = 'playlist.xspf'
-        self.stations = []
-        self.stationnames = []
+        self.stations = {}
         # Not required for now, radiolist.js is up-to-date.
         #self.get_radiolist()
         self.get_stations()
@@ -74,12 +76,12 @@ class PlaylistGenerator(object):
             for line in text:
                 match = rx.search(line)
                 if match:
-                    self.stations.append(match.groupdict())
+                    self.stations[match.groupdict()['id']] = match.groupdict()
 
     def print_stations(self):
-        for md in self.stations:
+        for sid in self.stations.keys():
             print(u"Τίτλος : {0}\nΠόλη : {1}\nId : {2}\nLogo : {3}\n".format(
-                md['title'], md['city'], md['id'], md['logo']))
+                self.stations[sid]['title'], self.stations[sid]['city'], sid, self.stations[sid]['logo']))
 
     def get_radiolist(self):
         f = urllib.urlopen(self.url_rlist)
@@ -100,25 +102,24 @@ class PlaylistGenerator(object):
         url_main = u"http://www.e-radio.gr/player/player.el.asp?sid="
         rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&weblink=(?P<weblink>[^&]*)"
         rx = re.compile(rxstr)
-        i = 0
-        for station in self.stations:
-            url_station = url_main + station["id"]
+        for (index, sid) in enumerate(self.stations.keys()):
+            url_station = url_main + sid
             spider = Spider(url_station)
             src = spider.src
             print("src: {0}".format(src))
             match = rx.search(src)
             if match:
                 d = match.groupdict()
-                self.stationnames.append(d)
+                self.stations[sid]['cn'] = d['cn']
+                self.stations[sid]['url'] = 'http://www.e-radio.gr/asx/' + d['cn'] + '.asx'
                 print("stationname dict: {0}".format(d))
                 print("radio link: http://www.e-radio.gr/asx/{0}.asx".format(d["cn"]))
             else:
                 print("Error in parsing radio station:", src)
                 sys.exit(-1)
 
-            # Για 4 σταθμούς μόνο, για τη δοκιμή μας.
-            i = i + 1
-            if i > 3:
+            # Για 3 σταθμούς μόνο, για τη δοκιμή μας.
+            if index >= TESTCOUNT:
                 break
 
     def make_pls(self):
@@ -126,13 +127,15 @@ class PlaylistGenerator(object):
         Create a *.pls file.
         http://en.wikipedia.org/wiki/PLS_%28file_format%29
         """
-        ns = len(self.stations)
+        ns = len(self.stations.keys())
         s = u""
         s += "[playlist]\n\n"
-        for index, station in enumerate(self.stations):
-            s += "File%d=%s\n" % (index, index)          # TODO put real url
-            s += "Title%d=%s\n" % (index, station['title'])
+        for (index, sid) in enumerate(self.stations.keys()):
+            s += "File%d=%s\n" % (index, self.stations[sid]['url'])
+            s += "Title%d=%s\n" % (index, self.stations[sid]['title'])
             s += "Length=-1\n\n"
+            if index >= 3:
+                break
         s += "NumberofEntries=%d\n\n" % ns
         s += "Version=2\n"
         with codecs.open(self.file_pls, mode="w", encoding="utf-8") as f:
@@ -147,13 +150,15 @@ class PlaylistGenerator(object):
         s += '<?xml version="1.0" encoding="UTF-8"?>\n'
         s += '<playlist version="1" xmlns="http://xspf.org/ns/0/">\n'
         s += '    <trackList>\n'
-        for station in self.stations:
+        for (index, sid) in enumerate(self.stations.keys()):
             s += "        <track>\n"
-            s += "            <location>%s</location>\n" % station['title']   # TODO put real url
-            s += "            <title>%s</title>\n" % station['title']
-            s += "            <annotation>%s</annotation>\n" % station['city']
-            s += "            <image>http://eradio.gr%s</image>\n" % station['logo']
+            s += "            <location>%s</location>\n" % self.stations[sid]['url']
+            s += "            <title>%s</title>\n" % self.stations[sid]['title']
+            s += "            <annotation>%s</annotation>\n" % self.stations[sid]['city']
+            s += "            <image>http://eradio.gr%s</image>\n" % self.stations[sid]['logo']
             s += "        </track>\n"
+            if index >= TESTCOUNT:
+                break
         s += "    </trackList>\n"
         s += "</playlist>\n"
 
