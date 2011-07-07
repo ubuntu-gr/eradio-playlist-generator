@@ -84,7 +84,6 @@ class PlaylistGenerator(object):
         s += "Version=2\n"
         with codecs.open(self.file_pls, mode="w", encoding="utf-8") as f:
             f.write(s)
-        print(s)
 
     def make_xspf(self):
         """
@@ -107,10 +106,11 @@ class PlaylistGenerator(object):
 
         with codecs.open(self.file_xspf, mode="w", encoding="utf-8") as f:
             f.write(s)
-        print(s)
 
 if __name__ == '__main__':
     playlist = PlaylistGenerator()
     playlist.print_stations()
     playlist.make_pls()
+    print(u'Created .PLS playlist file, playlist.pls')
     playlist.make_xspf()
+    print(u'Created .XSPF playlist file, playlist.xspf')
