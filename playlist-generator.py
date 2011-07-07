@@ -24,7 +24,7 @@ from __future__ import print_function
 import codecs
 import re
 import urllib
-
+import sys
 from HTMLParser import HTMLParser
 
 # Για τις δοκιμές κάνουμε λήψη 3 σελίδων μόνο. Στην πλήρη έκδοση το αφαιρούμε.
@@ -111,7 +111,14 @@ class PlaylistGenerator(object):
             if match:
                 d = match.groupdict()
                 self.stations[sid]['cn'] = d['cn']
-                self.stations[sid]['url'] = 'http://www.e-radio.gr/asx/' + d['cn'] + '.asx'
+                req = urllib.urlopen('http://www.e-radio.gr/asx/' + d['cn'] + '.asx')
+                html = req.read()
+                url = re.search(r'REF HREF = "(.*?)"',html)
+                if url:
+                    self.stations[sid]['url'] = url.group(1)
+                else:
+                    print("Couldn't find url for this station", src)
+                    sys.exit(-1)
                 print("stationname dict: {0}".format(d))
                 print("radio link: http://www.e-radio.gr/asx/{0}.asx".format(d["cn"]))
             else:
