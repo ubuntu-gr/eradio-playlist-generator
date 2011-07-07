@@ -141,9 +141,9 @@ class PlaylistGenerator(object):
             s += "File%d=%s\n" % (index, self.stations[sid]['url'])
             s += "Title%d=%s\n" % (index, self.stations[sid]['title'])
             s += "Length=-1\n\n"
-            if index >= 3:
+            if index >= TESTCOUNT:
                 break
-        s += "NumberofEntries=%d\n\n" % ns
+        s += "NumberofEntries=%d\n\n" % TESTCOUNT #TODO: Replace TEXTCOUNT with ns when all is working
         s += "Version=2\n"
         with codecs.open(self.file_pls, mode="w", encoding="utf-8") as f:
             f.write(s)
