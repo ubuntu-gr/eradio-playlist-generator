@@ -25,6 +25,23 @@ import codecs
 import re
 import urllib
 
+from HTMLParser import HTMLParser
+
+class Spider(HTMLParser):
+    def __init__(self, url):
+        HTMLParser.__init__(self)
+
+        self.src = ""
+
+        req = urllib.urlopen(url)
+        self.feed(req.read())
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "iframe":
+            for attr in attrs:
+                if attr[0] == "src" and attr[1].startswith("playerX"):
+                    self.src = attr[1]
+
 class PlaylistGenerator(object):
     def __init__(self):
         super(PlaylistGenerator, self).__init__()
@@ -33,6 +50,7 @@ class PlaylistGenerator(object):
         self.file_pls = 'playlist.pls'
         self.file_xspf = 'playlist.xspf'
         self.stations = []
+        self.stationnames = []
         # Not required for now, radiolist.js is up-to-date.
         #self.get_radiolist()
         self.get_stations()
@@ -67,6 +85,34 @@ class PlaylistGenerator(object):
         utext = unicode(text, "iso-8859-7")
         with codecs.open(self.file_rlist, mode="w", encoding="utf-8") as f:
             f.write(utext)
+
+    def get_radiostation_files(self):
+        url_main = u"http://www.e-radio.gr/player/player.el.asp?sid="
+        rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&weblink="
+        rx = re.compile(rxstr)
+        i = 0
+        for station in self.stations:
+            url_station = url_main + station["id"]
+            spider = Spider(url_station)
+            src = spider.src
+            match = rx.search(src)
+            if match:
+                self.stationnames.append(match.groupdict())
+                """ match.groupdict() example:
+                {
+                    'sid': u'1197',
+                    'cn': u'alfaserres'
+                }
+                """
+                print(match.groupdict())
+            else:
+                print("Error in parsing radio station:", src)
+                sys.exit(-1)
+
+            # Για 4 σταθμούς μόνο, για τη δοκιμή μας.
+            i = i + 1
+            if i > 3:
+                break
 
     def make_pls(self):
         """
@@ -109,7 +155,8 @@ class PlaylistGenerator(object):
 
 if __name__ == '__main__':
     playlist = PlaylistGenerator()
-    playlist.print_stations()
+    playlist.get_radiostation_files()
+    #playlist.print_stations()
     playlist.make_pls()
     print(u'Created .PLS playlist file, playlist.pls')
     playlist.make_xspf()
