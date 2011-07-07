@@ -56,6 +56,16 @@ class PlaylistGenerator(object):
         self.get_stations()
 
     def get_stations(self):
+        """ Creates a dictionary with station information.
+        Appends the stations in self.stations list.
+        match.groupdict() example:
+        {
+            'logo': u'/logos/gr/mini/nologo.gif',
+            'title': u'\u0386\u03bb\u03c6\u03b1 Radio 96',
+            'id': u'1197',
+            'city': u'\u03a3\u0395\u03a1\u03a1\u0395\u03a3'
+        }
+        """
         # { mediatitle: "Άλφα Radio 96", city: "ΣΕΡΡΕΣ", mediaid: 1197, logo: "/logos/gr/mini/nologo.gif" }, 
         rxstr = r'mediatitle: "(?P<title>[^"]*)", city: "(?P<city>[^"]*)", mediaid: (?P<id>\d+), logo: "(?P<logo>[^"]*)"'
         rx = re.compile(rxstr)
@@ -65,14 +75,6 @@ class PlaylistGenerator(object):
                 match = rx.search(line)
                 if match:
                     self.stations.append(match.groupdict())
-                    """ match.groupdict() example:
-                    {
-                        'logo': u'/logos/gr/mini/nologo.gif',
-                        'title': u'\u0386\u03bb\u03c6\u03b1 Radio 96',
-                        'id': u'1197',
-                        'city': u'\u03a3\u0395\u03a1\u03a1\u0395\u03a3'
-                    }
-                    """
 
     def print_stations(self):
         for md in self.stations:
@@ -87,24 +89,29 @@ class PlaylistGenerator(object):
             f.write(utext)
 
     def get_radiostation_files(self):
+        """ Contacts e-radio.gr website, receives radio station link.
+        match.groupdict() example:
+        {
+            'sid': u'1197',
+            'cn': u'alfaserres'
+            'weblink': u''
+        }
+        """
         url_main = u"http://www.e-radio.gr/player/player.el.asp?sid="
-        rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&weblink="
+        rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&weblink=(?P<weblink>[^&]*)"
         rx = re.compile(rxstr)
         i = 0
         for station in self.stations:
             url_station = url_main + station["id"]
             spider = Spider(url_station)
             src = spider.src
+            print("src: {0}".format(src))
             match = rx.search(src)
             if match:
-                self.stationnames.append(match.groupdict())
-                """ match.groupdict() example:
-                {
-                    'sid': u'1197',
-                    'cn': u'alfaserres'
-                }
-                """
-                print(match.groupdict())
+                d = match.groupdict()
+                self.stationnames.append(d)
+                print("stationname dict: {0}".format(d))
+                print("radio link: http://www.e-radio.gr/asx/{0}.asx".format(d["cn"]))
             else:
                 print("Error in parsing radio station:", src)
                 sys.exit(-1)
