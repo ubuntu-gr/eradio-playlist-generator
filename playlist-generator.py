@@ -31,6 +31,7 @@ class PlaylistGenerator(object):
         self.url_rlist = "http://www.e-radio.gr/cache/mediadata_1.js"
         self.file_rlist = 'radiolist.js'
         self.file_pls = 'playlist.pls'
+        self.file_xspf = 'playlist.xspf'
         self.stations = []
         # Not required for now, radiolist.js is up-to-date.
         #self.get_radiolist()
@@ -85,7 +86,31 @@ class PlaylistGenerator(object):
             f.write(s)
         print(s)
 
+    def make_xspf(self):
+        """
+        Create a *.xspf file.
+        http://www.xspf.org
+        """
+        s = u""
+        s += '<?xml version="1.0" encoding="UTF-8"?>\n'
+        s += '<playlist version="1" xmlns="http://xspf.org/ns/0/">\n'
+        s += '    <trackList>\n'
+        for station in self.stations:
+            s += "        <track>\n"
+            s += "            <location>%s</location>\n" % station['title']   # TODO put real url
+            s += "            <title>%s</title>\n" % station['title']
+            s += "            <annotation>%s</annotation>\n" % station['city']
+            s += "            <image>http://eradio.gr%s</image>\n" % station['logo']
+            s += "        </track>\n"
+        s += "    </trackList>\n"
+        s += "</playlist>\n"
+
+        with codecs.open(self.file_xspf, mode="w", encoding="utf-8") as f:
+            f.write(s)
+        print(s)
+
 if __name__ == '__main__':
     playlist = PlaylistGenerator()
     playlist.print_stations()
     playlist.make_pls()
+    playlist.make_xspf()
