@@ -26,16 +26,27 @@ import re
 import urllib
 import sys
 from HTMLParser import HTMLParser
+import shelve
 
 # Για τις δοκιμές κάνουμε λήψη 3 σελίδων μόνο. Στην πλήρη έκδοση το αφαιρούμε.
 TESTCOUNT = 3
 
+class radiodb():
+    """ Used to store persistent data """
+    def __init__(self):
+        self.db_file = "cache.db"
+        #flag="c" Open database for reading and writing, creating it if it doesn’t exist
+        self.db = shelve.open(self.db_file, flag="c", writeback=True)
+
+    def rebuild(self):
+        """ Delete database and recreate it """
+        # flag="n" = Always create a new, empty database, open for reading and writing
+        self.db = shelve.open(self.db_file, flag="n", writeback=True)
+
 class Spider(HTMLParser):
     def __init__(self, url):
         HTMLParser.__init__(self)
-
         self.src = ""
-
         req = urllib.urlopen(url)
         self.feed(req.read())
 
@@ -52,9 +63,7 @@ class PlaylistGenerator(object):
         self.file_rlist = 'radiolist.js'
         self.file_pls = 'playlist.pls'
         self.file_xspf = 'playlist.xspf'
-        self.stations = {}
-        # Not required for now, radiolist.js is up-to-date.
-        #self.get_radiolist()
+        self.stations = radiodb().db
         self.get_stations()
 
     def get_stations(self):
@@ -76,14 +85,15 @@ class PlaylistGenerator(object):
             for line in text:
                 match = rx.search(line)
                 if match:
-                    self.stations[match.groupdict()['id']] = match.groupdict()
-
-    def print_stations(self):
-        for sid in self.stations.keys():
-            print(u"Τίτλος : {0}\nΠόλη : {1}\nId : {2}\nLogo : {3}\n".format(
-                self.stations[sid]['title'], self.stations[sid]['city'], sid, self.stations[sid]['logo']))
+                    d = match.groupdict()
+                    did = d['id'].encode('utf-8')
+                    if not self.stations.has_key(did):
+                        self.stations[did] = d
 
     def get_radiolist(self):
+        """ Reads radio list from self.url_rlist
+        Writes to file self.file_rlist
+        """
         f = urllib.urlopen(self.url_rlist)
         text = f.read().replace("\r", "\n") # Strip \r characters
         utext = unicode(text, "iso-8859-7")
@@ -99,10 +109,13 @@ class PlaylistGenerator(object):
             'weblink': u''
         }
         """
-        url_main = u"http://www.e-radio.gr/player/player.el.asp?sid="
+        url_main = "http://www.e-radio.gr/player/player.el.asp?sid="
         rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&weblink=(?P<weblink>[^&]*)"
         rx = re.compile(rxstr)
         for (index, sid) in enumerate(self.stations.keys()):
+            if self.stations[sid].has_key('url'):
+                print("Skipping radio id {0} ({1}), already in cache".format(sid, self.stations[sid]["cn"]))
+                continue
             url_station = url_main + sid
             spider = Spider(url_station)
             src = spider.src
@@ -111,7 +124,7 @@ class PlaylistGenerator(object):
             if match:
                 d = match.groupdict()
                 self.stations[sid]['cn'] = d['cn']
-                req = urllib.urlopen('http://www.e-radio.gr/asx/' + d['cn'] + '.asx')
+                req = urllib.urlopen('http://www.e-radio.gr/asx/{0}.asx'.format(d['cn']))
                 html = req.read()
                 url = re.search(r'REF HREF = "(.*?)"',html)
                 if url:
@@ -119,8 +132,9 @@ class PlaylistGenerator(object):
                 else:
                     print("Couldn't find url for this station", src)
                     sys.exit(-1)
-                print("stationname dict: {0}".format(d))
-                print("radio link: http://www.e-radio.gr/asx/{0}.asx".format(d["cn"]))
+                print("station dict: {0} \
+asx: http://www.e-radio.gr/asx/{1}.asx \
+mms: {2} ".format(d, d["cn"], self.stations[sid]["url"]))
             else:
                 print("Error in parsing radio station:", src)
                 sys.exit(-1)
@@ -130,13 +144,11 @@ class PlaylistGenerator(object):
                 break
 
     def make_pls(self):
-        """
-        Create a *.pls file.
+        """ Create a *.pls file.
         http://en.wikipedia.org/wiki/PLS_%28file_format%29
         """
         ns = len(self.stations.keys())
-        s = u""
-        s += "[playlist]\n\n"
+        s = u"[playlist]\n\n"
         for (index, sid) in enumerate(self.stations.keys()):
             s += "File%d=%s\n" % (index, self.stations[sid]['url'])
             s += "Title%d=%s\n" % (index, self.stations[sid]['title'])
@@ -149,12 +161,10 @@ class PlaylistGenerator(object):
             f.write(s)
 
     def make_xspf(self):
-        """
-        Create a *.xspf file.
+        """ Create a *.xspf file.
         http://www.xspf.org
         """
-        s = u""
-        s += '<?xml version="1.0" encoding="UTF-8"?>\n'
+        s = u'<?xml version="1.0" encoding="UTF-8"?>\n'
         s += '<playlist version="1" xmlns="http://xspf.org/ns/0/">\n'
         s += '    <trackList>\n'
         for (index, sid) in enumerate(self.stations.keys()):
@@ -175,7 +185,7 @@ class PlaylistGenerator(object):
 if __name__ == '__main__':
     playlist = PlaylistGenerator()
     playlist.get_radiostation_files()
-    #playlist.print_stations()
+    playlist.stations.sync() # Write to cache
     playlist.make_pls()
     print(u'Created .PLS playlist file, playlist.pls')
     playlist.make_xspf()
