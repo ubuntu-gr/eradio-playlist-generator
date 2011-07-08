@@ -226,3 +226,4 @@ if __name__ == '__main__':
     print(u'Created .PLS playlist file, playlist.pls')
     playlist.make_xspf()
     print(u'Created .XSPF playlist file, playlist.xspf')
+    print("Blacklist: {0}".format(playlist.blacklist))
