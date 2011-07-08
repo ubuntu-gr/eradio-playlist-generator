@@ -28,6 +28,10 @@ import sys
 from HTMLParser import HTMLParser
 import shelve
 
+# HTTP debug:
+import httplib
+httplib.HTTPConnection.debuglevel = 1
+
 # Για τις δοκιμές κάνουμε λήψη 3 σελίδων μόνο. Στην πλήρη έκδοση το αφαιρούμε.
 TESTCOUNT = 3
 
@@ -54,7 +58,12 @@ class Spider(HTMLParser):
         if tag == "iframe":
             for attr in attrs:
                 if attr[0] == "src" and attr[1].startswith("playerX"):
-                    self.src = attr[1]
+                    self.src = (attr[1], "playerx")
+        elif tag == "embed":
+            for attr in attrs:
+                if attr[0] == "src" and attr[1].startswith("http://www.e-radio.gr/asx"):
+                    self.src = (attr[1], "asx")
+        # self.src[0] => link, self.src[1] => type
 
 class PlaylistGenerator(object):
     def __init__(self):
@@ -64,6 +73,7 @@ class PlaylistGenerator(object):
         self.file_pls = 'playlist.pls'
         self.file_xspf = 'playlist.xspf'
         self.stations = radiodb().db
+        self.blacklist = ["1715", "1887", "307", "1803", "1758", "1805", "801"]
         self.get_stations()
 
     def get_stations(self):
@@ -106,7 +116,7 @@ class PlaylistGenerator(object):
         match.groupdict() example:
         {
             'sid': u'1197',
-            'cn': u'alfaserres'
+            'cn': u'alfaserres',
             'weblink': u''
         }
         """
@@ -114,35 +124,56 @@ class PlaylistGenerator(object):
         rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&weblink=(?P<weblink>[^&]*)"
         rx = re.compile(rxstr)
         for (index, sid) in enumerate(self.stations.keys()):
+            print("Processing sid: {0}".format(sid))
             if self.stations[sid].has_key('url'):
                 print("Skipping radio id {0} ({1}), already in cache".format(sid, self.stations[sid]["cn"]))
-                continue
+                continue #skip
+            if sid in self.blacklist:
+                print("Skipping radio id {0}, blacklisted".format(sid))
+                continue #skip
             url_station = url_main + sid
             spider = Spider(url_station)
             src = spider.src
             print("src: {0}".format(src))
-            match = rx.search(src)
+            if src:
+                match = rx.search(src[0])
+            else:
+                print("Error! src is empty: {0} station dict: {1} link: {2}".format(src, self.stations[sid], url_station))
+                #sys.exit(-1)
+                self.blacklist.append(sid)
+                print("Appended to blacklist and skipped: {0}".format(self.blacklist))
+                continue
             if match:
                 d = match.groupdict()
                 self.stations[sid]['cn'] = d['cn']
                 req = urllib.urlopen('http://www.e-radio.gr/asx/{0}.asx'.format(d['cn']))
                 html = req.read()
-                url = re.search(r'REF HREF = "(.*?)"',html)
+                url = re.search(r'REF HREF = "(.*?)"', html)
                 if url:
                     self.stations[sid]['url'] = url.group(1)
                 else:
-                    print("Couldn't find url for this station", src)
+                    print("Couldn't find url for this station: {0} {1}".format(src, self.stations[sid]))
                     sys.exit(-1)
-                print("station dict: {0} \
-asx: http://www.e-radio.gr/asx/{1}.asx \
-mms: {2} ".format(d, d["cn"], self.stations[sid]["url"]))
+                print("station dict: {0} asx: http://www.e-radio.gr/asx/{1}.asx mms: {2} ".format(d, d["cn"], self.stations[sid]["url"]))
+            elif src[1] == "asx":
+                d = { 'sid': sid, 'cn': u'', 'weblink': u'' }
+                self.stations[sid]['cn'] = d['cn']
+                req = urllib.urlopen(src[0])
+                html = req.read()
+                url = re.search(r'REF HREF = "(.*?)"', html)
+                if url:
+                    self.stations[sid]['url'] = url.group(1)
+                else:
+                    print("Couldn't find url for this station: {0} {1}".format(src[0], self.stations[sid]))
+                    sys.exit(-1)
+                print("station dict (default): {0} asx: {1} mms: {2} ".format(d, src[0], self.stations[sid]["url"]))
             else:
-                print("Error in parsing radio station:", src)
+                print("Error parsing radio station. src: {0} station dict: {1} link: {2}".format(src, self.stations[sid], url_station))
                 sys.exit(-1)
 
             # Για 3 σταθμούς μόνο, για τη δοκιμή μας.
-            if index >= TESTCOUNT:
-                break
+            #if index >= TESTCOUNT:
+                #break
 
     def make_pls(self):
         """ Create a *.pls file.
@@ -151,12 +182,14 @@ mms: {2} ".format(d, d["cn"], self.stations[sid]["url"]))
         ns = len(self.stations.keys())
         s = u"[playlist]\n\n"
         for (index, sid) in enumerate(self.stations.keys()):
+            if not self.stations[sid].has_key('url'):
+                continue #skip
             s += "File%d=%s\n" % (index, self.stations[sid]['url'])
             s += "Title%d=%s\n" % (index, self.stations[sid]['title'])
             s += "Length=-1\n\n"
-            if index >= TESTCOUNT:
-                break
-        s += "NumberofEntries=%d\n\n" % TESTCOUNT #TODO: Replace TEXTCOUNT with ns when all is working
+            #if index >= TESTCOUNT:
+                #break
+        s += "NumberofEntries=%d\n\n" % ns
         s += "Version=2\n"
         with codecs.open(self.file_pls, mode="w", encoding="utf-8") as f:
             f.write(s)
@@ -169,14 +202,16 @@ mms: {2} ".format(d, d["cn"], self.stations[sid]["url"]))
         s += '<playlist version="1" xmlns="http://xspf.org/ns/0/">\n'
         s += '    <trackList>\n'
         for (index, sid) in enumerate(self.stations.keys()):
+            if not self.stations[sid].has_key('url'):
+                continue #skip
             s += "        <track>\n"
             s += "            <location>%s</location>\n" % self.stations[sid]['url']
             s += "            <title>%s</title>\n" % self.stations[sid]['title']
             s += "            <annotation>%s</annotation>\n" % self.stations[sid]['city']
             s += "            <image>http://eradio.gr%s</image>\n" % self.stations[sid]['logo']
             s += "        </track>\n"
-            if index >= TESTCOUNT:
-                break
+            #if index >= TESTCOUNT:
+                #break
         s += "    </trackList>\n"
         s += "</playlist>\n"
 
