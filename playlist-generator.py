@@ -24,11 +24,9 @@ from __future__ import print_function
 import codecs
 import re
 import urllib
-import sys
 from HTMLParser import HTMLParser
+import multiprocessing
 
-# Για τις δοκιμές κάνουμε λήψη 3 σελίδων μόνο. Στην πλήρη έκδοση το αφαιρούμε.
-TESTCOUNT = 3
 
 class Spider(HTMLParser):
     def __init__(self, url):
@@ -45,138 +43,142 @@ class Spider(HTMLParser):
                 if attr[0] == "src" and attr[1].startswith("playerX"):
                     self.src = attr[1]
 
-class PlaylistGenerator(object):
-    def __init__(self):
-        super(PlaylistGenerator, self).__init__()
-        self.url_rlist = "http://www.e-radio.gr/cache/mediadata_1.js"
-        self.file_rlist = 'radiolist.js'
-        self.file_pls = 'playlist.pls'
-        self.file_xspf = 'playlist.xspf'
-        self.stations = {}
-        # Not required for now, radiolist.js is up-to-date.
-        #self.get_radiolist()
-        self.get_stations()
+url_rlist = "http://www.e-radio.gr/cache/mediadata_1.js"
+file_rlist = 'radiolist.js'
+file_pls = 'playlist.pls'
+file_xspf = 'playlist.xspf'
+stations = {}
+PROCESSES = 4
+CHUNKS = 4
 
-    def get_stations(self):
-        """ Creates a dictionary with station information.
-        Appends the stations in self.stations list.
-        match.groupdict() example:
-        {
-            'logo': u'/logos/gr/mini/nologo.gif',
-            'title': u'\u0386\u03bb\u03c6\u03b1 Radio 96',
-            'id': u'1197',
-            'city': u'\u03a3\u0395\u03a1\u03a1\u0395\u03a3'
-        }
-        """
-        # { mediatitle: "Άλφα Radio 96", city: "ΣΕΡΡΕΣ", mediaid: 1197, logo: "/logos/gr/mini/nologo.gif" }, 
-        rxstr = r'mediatitle: "(?P<title>[^"]*)", city: "(?P<city>[^"]*)", mediaid: (?P<id>\d+), logo: "(?P<logo>[^"]*)"'
-        rx = re.compile(rxstr)
-        with codecs.open(self.file_rlist, 'r', 'utf-8') as f:
-            text = f.readlines()
-            for line in text:
-                match = rx.search(line)
-                if match:
-                    self.stations[match.groupdict()['id']] = match.groupdict()
-
-    def print_stations(self):
-        for sid in self.stations.keys():
-            print(u"Τίτλος : {0}\nΠόλη : {1}\nId : {2}\nLogo : {3}\n".format(
-                self.stations[sid]['title'], self.stations[sid]['city'], sid, self.stations[sid]['logo']))
-
-    def get_radiolist(self):
-        f = urllib.urlopen(self.url_rlist)
-        text = f.read().replace("\r", "\n") # Strip \r characters
-        utext = unicode(text, "iso-8859-7")
-        with codecs.open(self.file_rlist, mode="w", encoding="utf-8") as f:
-            f.write(utext)
-
-    def get_radiostation_files(self):
-        """ Contacts e-radio.gr website, receives radio station link.
-        match.groupdict() example:
-        {
-            'sid': u'1197',
-            'cn': u'alfaserres'
-            'weblink': u''
-        }
-        """
-        url_main = u"http://www.e-radio.gr/player/player.el.asp?sid="
-        rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&weblink=(?P<weblink>[^&]*)"
-        rx = re.compile(rxstr)
-        for (index, sid) in enumerate(self.stations.keys()):
-            url_station = url_main + sid
-            spider = Spider(url_station)
-            src = spider.src
-            print("src: {0}".format(src))
-            match = rx.search(src)
+def get_stations():
+    """ Creates a dictionary with station information.
+    Appends the stations in self.stations list.
+    match.groupdict() example:
+    {
+        'logo': u'/logos/gr/mini/nologo.gif',
+        'title': u'\u0386\u03bb\u03c6\u03b1 Radio 96',
+        'id': u'1197',
+        'city': u'\u03a3\u0395\u03a1\u03a1\u0395\u03a3'
+    }
+    """
+    # { mediatitle: "Άλφα Radio 96", city: "ΣΕΡΡΕΣ", mediaid: 1197, logo: "/logos/gr/mini/nologo.gif" }, 
+    rxstr = r'mediatitle: "(?P<title>[^"]*)", city: "(?P<city>[^"]*)", mediaid: (?P<id>\d+), logo: "(?P<logo>[^"]*)"'
+    rx = re.compile(rxstr)
+    with codecs.open(file_rlist, 'r', 'utf-8') as f:
+        text = f.readlines()
+        for line in text:
+            match = rx.search(line)
             if match:
-                d = match.groupdict()
-                self.stations[sid]['cn'] = d['cn']
-                req = urllib.urlopen('http://www.e-radio.gr/asx/' + d['cn'] + '.asx')
-                html = req.read()
-                url = re.search(r'REF HREF = "(.*?)"',html)
-                if url:
-                    self.stations[sid]['url'] = url.group(1)
-                else:
-                    print("Couldn't find url for this station", src)
-                    sys.exit(-1)
-                print("stationname dict: {0}".format(d))
-                print("radio link: http://www.e-radio.gr/asx/{0}.asx".format(d["cn"]))
-            else:
-                print("Error in parsing radio station:", src)
-                sys.exit(-1)
+                stations[match.groupdict()['id']] = match.groupdict()
+    return len(stations)
+    
+def print_stations():
+        for sid in stations.keys():
+            print(u"Τίτλος : {0}\nΠόλη : {1}\nId : {2}\nLogo : {3}\n".format(
+                stations[sid]['title'], stations[sid]['city'], sid, stations[sid]['logo']))
 
-            # Για 3 σταθμούς μόνο, για τη δοκιμή μας.
-            if index >= TESTCOUNT:
-                break
+def get_radiolist():
+    f = urllib.urlopen(url_rlist)
+    text = f.read().replace("\r", "\n") # Strip \r characters
+    utext = unicode(text, "iso-8859-7")
+    with codecs.open(file_rlist, mode="w", encoding="utf-8") as f:
+        f.write(utext)
 
-    def make_pls(self):
-        """
-        Create a *.pls file.
-        http://en.wikipedia.org/wiki/PLS_%28file_format%29
-        """
-        ns = len(self.stations.keys())
-        s = u""
-        s += "[playlist]\n\n"
-        for (index, sid) in enumerate(self.stations.keys()):
-            s += "File%d=%s\n" % (index, self.stations[sid]['url'])
-            s += "Title%d=%s\n" % (index, self.stations[sid]['title'])
+def get_radiostation_files(sid):
+    """ Contacts e-radio.gr website, receives radio station link.
+    match.groupdict() example:
+    {
+    'sid': u'1197',
+    'cn': u'alfaserres'
+    'weblink': u''
+    }
+    """
+    url_main = u"http://www.e-radio.gr/player/player.el.asp?sid="
+    rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&weblink=(?P<weblink>[^&]*)"
+    rx = re.compile(rxstr)
+    url_station = url_main + sid
+    spider = Spider(url_station)
+    src = spider.src
+    match = rx.search(src)
+    if match:
+        d = match.groupdict()
+        req = urllib.urlopen('http://www.e-radio.gr/asx/' + d['cn'] + '.asx')
+        html = req.read()
+        url = re.search(r'REF HREF = "(.*?)"',html)
+        if url:
+            return sid, url.group(1)
+    return None
+
+def make_pls():
+    """
+    Create a *.pls file.
+    http://en.wikipedia.org/wiki/PLS_%28file_format%29
+    """
+    ns = 0
+    s = u""
+    s += "[playlist]\n\n"
+    for sid in stations.keys():
+        try:
+            url=stations[sid]['url']
+            ns+=1
+            s += "File%d=%s\n" % (ns, url)
+            s += "Title%d=%s\n" % (ns, stations[sid]['title'])
             s += "Length=-1\n\n"
-            if index >= TESTCOUNT:
-                break
-        s += "NumberofEntries=%d\n\n" % TESTCOUNT #TODO: Replace TEXTCOUNT with ns when all is working
-        s += "Version=2\n"
-        with codecs.open(self.file_pls, mode="w", encoding="utf-8") as f:
-            f.write(s)
+        except:
+            pass
+    s += "NumberofEntries=%d\n\n" % ns
+    s += "Version=2\n"
+    with codecs.open(file_pls, mode="w", encoding="utf-8") as f:
+        f.write(s)
+    return ns
 
-    def make_xspf(self):
-        """
-        Create a *.xspf file.
-        http://www.xspf.org
-        """
-        s = u""
-        s += '<?xml version="1.0" encoding="UTF-8"?>\n'
-        s += '<playlist version="1" xmlns="http://xspf.org/ns/0/">\n'
-        s += '    <trackList>\n'
-        for (index, sid) in enumerate(self.stations.keys()):
+def make_xspf():
+    """
+    Create a *.xspf file.
+    http://www.xspf.org
+    """
+    ns = 0
+    s = u""
+    s += '<?xml version="1.0" encoding="UTF-8"?>\n'
+    s += '<playlist version="1" xmlns="http://xspf.org/ns/0/">\n'
+    s += '    <trackList>\n'
+    for sid in stations.keys():
+        try:
+            url = stations[sid]['url']
+            ns += 1
             s += "        <track>\n"
-            s += "            <location>%s</location>\n" % self.stations[sid]['url']
-            s += "            <title>%s</title>\n" % self.stations[sid]['title']
-            s += "            <annotation>%s</annotation>\n" % self.stations[sid]['city']
-            s += "            <image>http://eradio.gr%s</image>\n" % self.stations[sid]['logo']
+            s += "            <location>%s</location>\n" % url
+            s += "            <title>%s</title>\n" % stations[sid]['title']
+            s += "            <annotation>%s</annotation>\n" % stations[sid]['city']
+            s += "            <image>http://eradio.gr%s</image>\n" % stations[sid]['logo']
             s += "        </track>\n"
-            if index >= TESTCOUNT:
-                break
-        s += "    </trackList>\n"
-        s += "</playlist>\n"
+        except:
+            pass
+    s += "    </trackList>\n"
+    s += "</playlist>\n"
+    with codecs.open(file_xspf, mode="w", encoding="utf-8") as f:
+        f.write(s)
+    return ns
 
-        with codecs.open(self.file_xspf, mode="w", encoding="utf-8") as f:
-            f.write(s)
+def main():
+    print("Getting list of stations")
+    get_radiolist()
+    print("Processing stations")
+    print("{0:d} stations processed".format(get_stations()))
+    pool = multiprocessing.Pool(PROCESSES)
+    print("Finding out stations' urls")
+    results = pool.map(get_radiostation_files, stations.keys(),CHUNKS)
+    for r in results:
+        if r:
+            (sid, url)=r
+            stations[sid]['url']=url
+    print("Saving pls file with {0:d} stations".format(make_pls()))
+    print("Saving xspf file with {0:d} stations".format(make_xspf()))
+    print("Done!")
 
 if __name__ == '__main__':
-    playlist = PlaylistGenerator()
-    playlist.get_radiostation_files()
-    #playlist.print_stations()
-    playlist.make_pls()
-    print(u'Created .PLS playlist file, playlist.pls')
-    playlist.make_xspf()
-    print(u'Created .XSPF playlist file, playlist.xspf')
+    multiprocessing.freeze_support()
+    main()
+
+   
