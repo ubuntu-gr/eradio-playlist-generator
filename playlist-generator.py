@@ -88,6 +88,7 @@ class PlaylistGenerator(object):
                     d = match.groupdict()
                     did = d['id'].encode('utf-8')
                     if not self.stations.has_key(did):
+                        # If not already in cache
                         self.stations[did] = d
 
     def get_radiolist(self):
