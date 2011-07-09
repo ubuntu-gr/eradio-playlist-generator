@@ -205,7 +205,7 @@ class PlaylistGenerator(object):
             if not self.stations[sid].has_key('url'):
                 continue #skip
             s += "        <track>\n"
-            s += "            <location>%s</location>\n" % self.stations[sid]['url']
+            s += "            <location>%s</location>\n" % self.stations[sid]['url'].replace("&", "&amp;")
             s += "            <title>%s</title>\n" % self.stations[sid]['title']
             s += "            <annotation>%s</annotation>\n" % self.stations[sid]['city']
             s += "            <image>http://eradio.gr%s</image>\n" % self.stations[sid]['logo']
