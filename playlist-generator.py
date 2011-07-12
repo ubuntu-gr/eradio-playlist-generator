@@ -26,7 +26,7 @@ import re
 import urllib
 from HTMLParser import HTMLParser
 import multiprocessing
-
+import sys
 
 class Spider(HTMLParser):
     def __init__(self, url):
@@ -48,8 +48,7 @@ file_rlist = 'radiolist.js'
 file_pls = 'playlist.pls'
 file_xspf = 'playlist.xspf'
 stations = {}
-PROCESSES = 4
-CHUNKS = 4
+PROCESSES = 5
 
 def get_stations():
     """ Creates a dictionary with station information.
@@ -85,31 +84,6 @@ def get_radiolist():
     with codecs.open(file_rlist, mode="w", encoding="utf-8") as f:
         f.write(utext)
 
-def get_radiostation_files(sid):
-    """ Contacts e-radio.gr website, receives radio station link.
-    match.groupdict() example:
-    {
-    'sid': u'1197',
-    'cn': u'alfaserres'
-    'weblink': u''
-    }
-    """
-    url_main = u"http://www.e-radio.gr/player/player.el.asp?sid="
-    rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&weblink=(?P<weblink>[^&]*)"
-    rx = re.compile(rxstr)
-    url_station = url_main + sid
-    spider = Spider(url_station)
-    src = spider.src
-    match = rx.search(src)
-    if match:
-        d = match.groupdict()
-        req = urllib.urlopen('http://www.e-radio.gr/asx/' + d['cn'] + '.asx')
-        html = req.read()
-        url = re.search(r'REF HREF = "(.*?)"',html)
-        if url:
-            return sid, url.group(1)
-    return None
-
 def make_pls():
     """
     Create a *.pls file.
@@ -117,17 +91,17 @@ def make_pls():
     """
     ns = 0
     s = u""
-    s += "[playlist]\n\n"
+    s += "[playlist]\n"
     for sid in stations.keys():
         try:
             url=stations[sid]['url']
             ns+=1
             s += "File%d=%s\n" % (ns, url)
             s += "Title%d=%s\n" % (ns, stations[sid]['title'])
-            s += "Length=-1\n\n"
+            s += "Length%d=-1\n" % (ns)
         except:
             pass
-    s += "NumberofEntries=%d\n\n" % ns
+    s += "NumberofEntries=%d\n" % ns
     s += "Version=2\n"
     with codecs.open(file_pls, mode="w", encoding="utf-8") as f:
         f.write(s)
@@ -161,18 +135,54 @@ def make_xspf():
         f.write(s)
     return ns
 
+def get_urls(id):
+    """ Contacts e-radio.gr website, receives radio station link.
+    match.groupdict() example:
+    {
+    'sid': u'1197',
+    'cn': u'alfaserres'
+    'weblink': u''
+    }
+    """
+    url_main = u"http://www.e-radio.gr/player/player.el.asp?sid="
+    rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&weblink=(?P<weblink>[^&]*)"
+    rx = re.compile(rxstr)
+    url_station = url_main + id
+    spider = Spider(url_station)
+    src = spider.src
+    match = rx.search(src)
+    if match:
+        d = match.groupdict()
+        req = urllib.urlopen('http://www.e-radio.gr/asx/' + d['cn'] + '.asx')
+        html = req.read()
+        url = re.search(r'REF HREF = "(.*?)"',html)
+        if url:
+            return (id, url.group(1))
+    return (id, None)
+
 def main():
     print("Getting list of stations")
-    get_radiolist()
+    #get_radiolist()
     print("Processing stations")
     print("{0:d} stations processed".format(get_stations()))
-    pool = multiprocessing.Pool(PROCESSES)
     print("Finding out stations' urls")
-    results = pool.map(get_radiostation_files, stations.keys(),CHUNKS)
-    for r in results:
-        if r:
-            (sid, url)=r
+    pool = multiprocessing.Pool(processes=PROCESSES)
+    lock = multiprocessing.Lock()
+    sl = len(stations.keys())
+    results = []
+    for i in range(0,sl,PROCESSES):
+        for j in range(PROCESSES):
+            if i+j < sl:
+                results.append(pool.apply_async(get_urls,(stations.keys()[i+j],)))
+    for i in range(sl):
+        (sid,url)=results[i].get()
+        if url:
             stations[sid]['url']=url
+        lock.acquire()
+        print("Completed: {0:3d}%".format(((i+1)*100)/sl), end='\r')
+        sys.stdout.flush()
+        lock.release()
+    print("")
     print("Saving pls file with {0:d} stations".format(make_pls()))
     print("Saving xspf file with {0:d} stations".format(make_xspf()))
     print("Done!")
