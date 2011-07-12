@@ -35,7 +35,7 @@ httplib.HTTPConnection.debuglevel = 1
 # Για τις δοκιμές κάνουμε λήψη 3 σελίδων μόνο. Στην πλήρη έκδοση το αφαιρούμε.
 TESTCOUNT = 3
 
-class radiodb():
+class RadioDB():
     """ Used to store persistent data """
     def __init__(self):
         self.db_file = "cache.db"
@@ -72,7 +72,7 @@ class PlaylistGenerator(object):
         self.file_rlist = 'radiolist.js'
         self.file_pls = 'playlist.pls'
         self.file_xspf = 'playlist.xspf'
-        self.stations = radiodb().db
+        self.stations = RadioDB().db
         self.blacklist = ["1715", "1887", "307", "1803", "1758", "1805", "801"]
         self.get_stations()
 
