@@ -26,7 +26,12 @@ import re
 import urllib
 import sys
 from HTMLParser import HTMLParser
-import shelve
+
+# cache.db
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 # HTTP debug:
 import httplib
@@ -36,16 +41,21 @@ httplib.HTTPConnection.debuglevel = 1
 TESTCOUNT = 3
 
 class RadioDB():
-    """ Used to store persistent data """
+    """ Used to store persistent data (self.db) """
     def __init__(self):
         self.db_file = "cache.db"
-        #flag="c" Open database for reading and writing, creating it if it doesn’t exist
-        self.db = shelve.open(self.db_file, flag="c", writeback=True)
+        self.db = dict()
+        self.load()
 
-    def rebuild(self):
-        """ Delete database and recreate it """
-        # flag="n" = Always create a new, empty database, open for reading and writing
-        self.db = shelve.open(self.db_file, flag="n", writeback=True)
+    def load(self):
+        # Sets self.db
+        with open(self.db_file, "r") as f:
+            self.db = pickle.load(f)
+
+    def dump(self):
+        # Writes self.db to self.db_file
+        with open(self.db_file, "w") as f:
+            pickle.dump(self.db, f)
 
 class Spider(HTMLParser):
     def __init__(self, url):
@@ -72,9 +82,11 @@ class PlaylistGenerator(object):
         self.file_rlist = 'radiolist.js'
         self.file_pls = 'playlist.pls'
         self.file_xspf = 'playlist.xspf'
-        self.stations = RadioDB().db
+        self.radiodb = RadioDB()
+        self.stations = self.radiodb.db
         self.blacklist = ["1715", "1887", "307", "1803", "1758", "1805", "801"]
         self.get_stations()
+        self.radiodb.dump() # Sync pickle
 
     def get_stations(self):
         """ Creates a dictionary with station information.
@@ -171,6 +183,8 @@ class PlaylistGenerator(object):
                 print("Error parsing radio station. src: {0} station dict: {1} link: {2}".format(src, self.stations[sid], url_station))
                 sys.exit(-1)
 
+            self.radiodb.dump() # Sync pickle
+
             # Για 3 σταθμούς μόνο, για τη δοκιμή μας.
             #if index >= TESTCOUNT:
                 #break
@@ -221,7 +235,6 @@ class PlaylistGenerator(object):
 if __name__ == '__main__':
     playlist = PlaylistGenerator()
     playlist.get_radiostation_files()
-    playlist.stations.sync() # Write to cache
     playlist.make_pls()
     print(u'Created .PLS playlist file, playlist.pls')
     playlist.make_xspf()
