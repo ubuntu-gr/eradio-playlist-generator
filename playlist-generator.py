@@ -41,7 +41,11 @@ class Spider(HTMLParser):
         if tag == "iframe":
             for attr in attrs:
                 if attr[0] == "src" and attr[1].startswith("playerX"):
-                    self.src = attr[1]
+                    self.src = (attr[1], "playerx")
+        elif tag == "embed":
+            for attr in attrs:
+                if attr[0] == "src" and attr[1].startswith("http://www.e-radio.gr/asx"):
+                    self.src = (attr[1], "asx")
 
 url_rlist = "http://www.e-radio.gr/cache/mediadata_1.js"
 file_rlist = 'radiolist.js'
@@ -98,7 +102,7 @@ def make_pls():
             ns+=1
             s += "File%d=%s\n" % (ns, url)
             s += "Title%d=%s\n" % (ns, stations[sid]['title'])
-            s += "Length%d=-1\n" % (ns)
+            s += "Length%d=0\n" % (ns)
         except:
             pass
     s += "NumberofEntries=%d\n" % ns
@@ -122,10 +126,8 @@ def make_xspf():
             url = stations[sid]['url']
             ns += 1
             s += "        <track>\n"
-            s += "            <location>%s</location>\n" % url
+            s += "            <location>%s</location>\n" % url.replace('&','&amp')
             s += "            <title>%s</title>\n" % stations[sid]['title']
-            s += "            <annotation>%s</annotation>\n" % stations[sid]['city']
-            s += "            <image>http://eradio.gr%s</image>\n" % stations[sid]['logo']
             s += "        </track>\n"
         except:
             pass
@@ -158,6 +160,12 @@ def get_urls(id):
         url = re.search(r'REF HREF = "(.*?)"',html)
         if url:
             return (id, url.group(1))
+    elif src[1] == "asx":
+        req = urllib.urlopen(src[0])
+        html = req.read()
+        url = re.search(r'REF HREF = "(.*?)"', html)
+        if url:
+            return ( id, url.group(1))
     return (id, None)
 
 def main():
