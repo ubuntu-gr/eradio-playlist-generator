@@ -102,7 +102,7 @@ def make_pls():
             ns+=1
             s += "File%d=%s\n" % (ns, url)
             s += "Title%d=%s\n" % (ns, stations[sid]['title'])
-            s += "Length%d=0\n" % (ns)
+            s += "Length%d=-1\n" % (ns)
         except:
             pass
     s += "NumberofEntries=%d\n" % ns
@@ -152,7 +152,10 @@ def get_urls(id):
     url_station = url_main + id
     spider = Spider(url_station)
     src = spider.src
-    match = rx.search(src)
+    if src:
+        match = rx.search(src[0])
+    else:
+        return (id, None)
     if match:
         d = match.groupdict()
         req = urllib.urlopen('http://www.e-radio.gr/asx/' + d['cn'] + '.asx')
@@ -170,7 +173,7 @@ def get_urls(id):
 
 def main():
     print("Getting list of stations")
-    #get_radiolist()
+    get_radiolist()
     print("Processing stations")
     print("{0:d} stations processed".format(get_stations()))
     print("Finding out stations' urls")
