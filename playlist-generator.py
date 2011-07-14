@@ -126,7 +126,7 @@ def make_xspf():
             url = stations[sid]['url']
             ns += 1
             s += "        <track>\n"
-            s += "            <location>%s</location>\n" % url.replace('&','&amp')
+            s += "            <location>%s</location>\n" % url.replace('&','&amp;')
             s += "            <title>%s</title>\n" % stations[sid]['title']
             s += "        </track>\n"
         except:
