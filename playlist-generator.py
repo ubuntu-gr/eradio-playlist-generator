@@ -193,17 +193,18 @@ class PlaylistGenerator(object):
         """ Create a *.pls file.
         http://en.wikipedia.org/wiki/PLS_%28file_format%29
         """
-        ns = len(self.stations.keys())
-        s = u"[playlist]\n\n"
+        ns = 0
+        s = u"[playlist]\n"
         for (index, sid) in enumerate(self.stations.keys()):
             if not self.stations[sid].has_key('url'):
                 continue #skip
+            ns += 1
             s += "File%d=%s\n" % (index, self.stations[sid]['url'])
             s += "Title%d=%s\n" % (index, self.stations[sid]['title'])
-            s += "Length=-1\n\n"
+            s += "Length%d=-1\n" % (ns)
             #if index >= TESTCOUNT:
                 #break
-        s += "NumberofEntries=%d\n\n" % ns
+        s += "NumberofEntries=%d\n" % ns
         s += "Version=2\n"
         with codecs.open(self.file_pls, mode="w", encoding="utf-8") as f:
             f.write(s)
@@ -221,8 +222,6 @@ class PlaylistGenerator(object):
             s += "        <track>\n"
             s += "            <location>%s</location>\n" % self.stations[sid]['url'].replace("&", "&amp;")
             s += "            <title>%s</title>\n" % self.stations[sid]['title']
-            s += "            <annotation>%s</annotation>\n" % self.stations[sid]['city']
-            s += "            <image>http://eradio.gr%s</image>\n" % self.stations[sid]['logo']
             s += "        </track>\n"
             #if index >= TESTCOUNT:
                 #break
