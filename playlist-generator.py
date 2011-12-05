@@ -84,7 +84,7 @@ class PlaylistGenerator(object):
         self.file_xspf = 'playlist.xspf'
         self.radiodb = RadioDB()
         self.stations = self.radiodb.db
-        self.blacklist = ["1715", "1887", "307", "1803", "1758", "1805", "801"]
+        self.blacklist = ['1758', '1887', '1715', '801', '307']
         self.get_stations()
         self.radiodb.dump() # Sync pickle
 
@@ -132,8 +132,8 @@ class PlaylistGenerator(object):
             'weblink': u''
         }
         """
-        url_main = "http://www.e-radio.gr/player/player.el.asp?sid="
-        rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&weblink=(?P<weblink>[^&]*)"
+        url_main = "http://www.e-radio.gr/player/player.asp?sid="
+        rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&stitle=(?P<stitle>[^&]*)&pt=(?P<pt>[^&]*)&weblink=(?P<weblink>[^&]*)"
         rx = re.compile(rxstr)
         for (index, sid) in enumerate(self.stations.keys()):
             print("Processing sid: {0}".format(sid))
@@ -158,12 +158,22 @@ class PlaylistGenerator(object):
             if match:
                 d = match.groupdict()
                 self.stations[sid]['cn'] = d['cn']
-                req = urllib.urlopen('http://www.e-radio.gr/asx/{0}.asx'.format(d['cn']))
-                html = req.read()
-                url = re.search(r'REF HREF = "(.*?)"', html)
-                if url:
-                    self.stations[sid]['url'] = url.group(1)
+                if d['weblink']: # If external weblink
+                    unquoted = urllib.unquote(d['weblink'])
+                    if (unquoted[0:3] != "http"):
+                        unquoted = "http://" + unquoted
+                    print("Found external weblink {0} - using as url".format(unquoted))
+                    self.stations[sid]['weblink'] = unquoted
+                    self.stations[sid]['url'] = unquoted
                 else:
+                    cnlink = 'http://www.e-radio.gr/asx/{0}.asx'.format(d['cn'])
+                    print("Did not find external weblink, trying {0}".format(cnlink))
+                    req = urllib.urlopen(cnlink)
+                    html = req.read()
+                    rxurl = re.search(r'REF HREF = "(.*?)"', html)
+                    if rxurl:
+                        self.stations[sid]['url'] = rxurl.group(1)
+                if not self.stations[sid]['url']:
                     print("Couldn't find url for this station: {0} {1}".format(src, self.stations[sid]))
                     sys.exit(-1)
                 print("station dict: {0} asx: http://www.e-radio.gr/asx/{1}.asx mms: {2} ".format(d, d["cn"], self.stations[sid]["url"]))
@@ -180,7 +190,7 @@ class PlaylistGenerator(object):
                     sys.exit(-1)
                 print("station dict (default): {0} asx: {1} mms: {2} ".format(d, src[0], self.stations[sid]["url"]))
             else:
-                print("Error parsing radio station. src: {0} station dict: {1} link: {2}".format(src, self.stations[sid], url_station))
+                print("Error parsing radio station link (Could not match regex). src: {0} station dict: {1} link: {2}".format(src, self.stations[sid], url_station))
                 sys.exit(-1)
 
             self.radiodb.dump() # Sync pickle
