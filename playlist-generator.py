@@ -81,6 +81,7 @@ class PlaylistGenerator(object):
         self.url_rlist = "http://www.e-radio.gr/cache/mediadata_1.js"
         self.file_rlist = 'radiolist.js'
         self.file_pls = 'playlist.pls'
+        self.file_txt = 'radiostations.txt'
         self.file_xspf = 'playlist.xspf'
         self.radiodb = RadioDB()
         self.stations = self.radiodb.db
@@ -199,6 +200,26 @@ class PlaylistGenerator(object):
             #if index >= TESTCOUNT:
                 #break
 
+    def make_txt(self):
+        """ Simple format, suitable for Greek Ubuntu ISO's
+            radiostations.txt
+        """
+        s  = "# List of radio stations in Rhythmbox and Banshee\n"
+        s += "#\n"
+        s += "# Format: arbitrarily many lines with\n"
+        s += "# URL; Genre; Name"
+        for (index, sid) in enumerate(self.stations.keys()):
+            if not self.stations[sid].has_key('url'):
+                continue #skip
+            s += self.stations[sid]['url']
+            s += "; "
+            s += "N/A; "
+            s += self.stations[sid]['title']
+            s += "\n"
+        with codecs.open(self.file_txt, mode="w", encoding="utf-8") as f:
+            f.write(s)
+
+
     def make_pls(self):
         """ Create a *.pls file.
         http://en.wikipedia.org/wiki/PLS_%28file_format%29
@@ -248,5 +269,7 @@ if __name__ == '__main__':
     print(u'Created .PLS playlist file, playlist.pls')
     playlist.make_xspf()
     print(u'Created .XSPF playlist file, playlist.xspf')
+    playlist.make_txt()
+    print(u'Created .txt playlist file, radiostations.txt')
     print("Blacklist: {0}".format(playlist.blacklist))
 
