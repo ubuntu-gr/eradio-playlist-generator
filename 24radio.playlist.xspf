@@ -54,7 +54,7 @@
             <title>Play Radio</title>
         </track>
         <track>
-            <location>mms://1045fm.live24.gr/1045fm/</location>
+            <location>mmsh://1045fm.live24.gr/1045fm/</location>
             <title>Ρυθμός 104.5</title>
         </track>
         <track>
@@ -110,7 +110,7 @@
             <title>Ιερά Μητρόπολη 88.4</title>
         </track>
         <track>
-            <location>mms://radiogamma.live24.gr/radiogamma</location>
+            <location>mmsh://radiogamma.live24.gr/radiogamma</location>
             <title>Ράδιο Γάμμα 94</title>
         </track>
         <track>
@@ -182,19 +182,19 @@
             <title>Παρέα 104</title>
         </track>
         <track>
-            <location>mms://johngreek.live24.gr/polis2795</location>
+            <location>mmsh://johngreek.live24.gr/polis2795</location>
             <title>NRJ Radio 88.6</title>
         </track>
         <track>
-            <location>mms://nitro.live24.gr/nitro4555</location>
+            <location>mmsh://nitro.live24.gr/nitro4555</location>
             <title>Nitro 102.5</title>
         </track>
         <track>
-            <location>mms://kissfm.live24.gr/kiss2111</location>
+            <location>mmsh://kissfm.live24.gr/kiss2111</location>
             <title>Kiss 92.9</title>
         </track>
         <track>
-            <location>mms://best.live24.gr/best1222</location>
+            <location>mmsh://best.live24.gr/best1222</location>
             <title>Best 92.6</title>
         </track>
         <track>
@@ -206,7 +206,7 @@
             <title>Δρόμος Fm 89.8</title>
         </track>
         <track>
-            <location>mms://sfera.live24.gr/sfera4132</location>
+            <location>mmsh://sfera.live24.gr/sfera4132</location>
             <title>Sfera 102.2</title>
         </track>
         <track>
@@ -246,7 +246,7 @@
             <title>Ακτίνα Fm 107.6</title>
         </track>
         <track>
-            <location>mms://radio.istoikona.com/cosmos</location>
+            <location>mmsh://radio.istoikona.com/cosmos</location>
             <title>Cosmos Radio 95.2</title>
         </track>
         <track>
@@ -334,27 +334,27 @@
             <title>Cosi Radio</title>
         </track>
         <track>
-            <location>mms://a1758.l3271933757.c32719.g.lm.akamaistream.net/D/1758/32719/v0001/reflector:33757</location>
+            <location>mmsh://a1758.l3271933757.c32719.g.lm.akamaistream.net/D/1758/32719/v0001/reflector:33757</location>
             <title>102 Fm</title>
         </track>
         <track>
-            <location>mms://radio.istoikona.com/starfmcy</location>
+            <location>mmsh://radio.istoikona.com/starfmcy</location>
             <title>Star Fm 93.7</title>
         </track>
         <track>
-            <location>mms://radio.istoikona.com/rockfm</location>
+            <location>mmsh://radio.istoikona.com/rockfm</location>
             <title>Rock Fm 98.5</title>
         </track>
         <track>
-            <location>mms://radio.istoikona.com/sport1</location>
+            <location>mmsh://radio.istoikona.com/sport1</location>
             <title>Sports 1 93.7</title>
         </track>
         <track>
-            <location>mms://radio.istoikona.com/kanali61</location>
+            <location>mmsh://radio.istoikona.com/kanali61</location>
             <title>Κανάλι 6 106</title>
         </track>
         <track>
-            <location>mms://live.istoikona.com/astra</location>
+            <location>mmsh://live.istoikona.com/astra</location>
             <title>Astra 92.8</title>
         </track>
         <track>
@@ -374,7 +374,7 @@
             <title>Μύθος Fm 90.6</title>
         </track>
         <track>
-            <location>mms://a1113.l3271935112.c32719.g.lm.akamaistream.net/D/1113/32719/v0001/reflector:35112</location>
+            <location>mmsh://a1113.l3271935112.c32719.g.lm.akamaistream.net/D/1113/32719/v0001/reflector:35112</location>
             <title>ΕΡΑ Σπορ 101.8</title>
         </track>
         <track>
@@ -422,7 +422,7 @@
             <title>Mix Fm 102.3</title>
         </track>
         <track>
-            <location>mms://live.istoikona.com/sferacy</location>
+            <location>mmsh://live.istoikona.com/sferacy</location>
             <title>Sfera 96.8</title>
         </track>
         <track>
@@ -438,7 +438,7 @@
             <title>Ηχόραμα</title>
         </track>
         <track>
-            <location>mms://live.istoikona.com/topfmcy</location>
+            <location>mmsh://live.istoikona.com/topfmcy</location>
             <title>Top Fm 99.9</title>
         </track>
         <track>
@@ -450,7 +450,7 @@
             <title>International Fm 107.5</title>
         </track>
         <track>
-            <location>mms://galaxy.live24.gr/galaxy9292</location>
+            <location>mmsh://galaxy.live24.gr/galaxy9292</location>
             <title>Galaxy 92</title>
         </track>
         <track>
@@ -462,7 +462,7 @@
             <title>V Fm 88.3</title>
         </track>
         <track>
-            <location>mms://derti.live24.gr/derty1000</location>
+            <location>mmsh://derti.live24.gr/derty1000</location>
             <title>Derti 98.6</title>
         </track>
         <track>
@@ -470,11 +470,11 @@
             <title>Athens Dee Jay 95.2</title>
         </track>
         <track>
-            <location>mms://orange.live24.gr/orange9320</location>
+            <location>mmsh://orange.live24.gr/orange9320</location>
             <title>Happy 93.2</title>
         </track>
         <track>
-            <location>mms://enleuko.live24.gr/enleuko877</location>
+            <location>mmsh://enleuko.live24.gr/enleuko877</location>
             <title>Εν Λευκώ 87.7</title>
         </track>
         <track>
@@ -482,7 +482,7 @@
             <title>Δίεση 101.3</title>
         </track>
         <track>
-            <location>mms://sportfm.live24.gr/sportfm7712</location>
+            <location>mmsh://sportfm.live24.gr/sportfm7712</location>
             <title>Nova Sport Fm 94.6</title>
         </track>
         <track>
@@ -510,7 +510,7 @@
             <title>Aquarius 105.5</title>
         </track>
         <track>
-            <location>mms://m2.onweb.gr/amorefm</location>
+            <location>mmsh://m2.onweb.gr/amorefm</location>
             <title>Amore Fm 107.9</title>
         </track>
         <track>
@@ -518,7 +518,7 @@
             <title>Ράδιο Υπάρχω 103.7</title>
         </track>
         <track>
-            <location>mms://radiofeeds1.mediabox.gr/attradio</location>
+            <location>mmsh://radiofeeds1.mediabox.gr/attradio</location>
             <title>Attradio</title>
         </track>
         <track>
@@ -666,7 +666,7 @@
             <title>Ράδιο Νοσταλγία</title>
         </track>
         <track>
-            <location>mms://captainjack.live24.gr/captainjack9660</location>
+            <location>mmsh://captainjack.live24.gr/captainjack9660</location>
             <title>Δίφωνο 96.6</title>
         </track>
         <track>
@@ -682,7 +682,7 @@
             <title>Traffic Fm 91.8</title>
         </track>
         <track>
-            <location>mms://kiss-fm-kard.live24.gr/kiss-fm-kard</location>
+            <location>mmsh://kiss-fm-kard.live24.gr/kiss-fm-kard</location>
             <title>Kiss 100.4</title>
         </track>
         <track>
@@ -698,7 +698,7 @@
             <title>Top Fm</title>
         </track>
         <track>
-            <location>mms://live.onestreaming.com/radio996/</location>
+            <location>mmsh://live.onestreaming.com/radio996/</location>
             <title>Radio 99.6</title>
         </track>
         <track>
@@ -734,7 +734,7 @@
             <title>Hybrid Radio 94.9</title>
         </track>
         <track>
-            <location>mms://nordr.live24.gr/rythmos949ath</location>
+            <location>mmsh://nordr.live24.gr/rythmos949ath</location>
             <title>Ρυθμός 94.9</title>
         </track>
         <track>
@@ -758,11 +758,11 @@
             <title>Μουσικό Κανάλι 101.3</title>
         </track>
         <track>
-            <location>mms://live.onestreaming.com/starfmdm</location>
+            <location>mmsh://live.onestreaming.com/starfmdm</location>
             <title>Star Fm 93.3</title>
         </track>
         <track>
-            <location>mms://live.istoikona.com/topfm</location>
+            <location>mmsh://live.istoikona.com/topfm</location>
             <title>Top Fm 102.4</title>
         </track>
         <track>
@@ -874,7 +874,7 @@
             <title>98 Fm</title>
         </track>
         <track>
-            <location>mms://live.istoikona.com/lgr</location>
+            <location>mmsh://live.istoikona.com/lgr</location>
             <title>LGR 103.3</title>
         </track>
         <track>
@@ -922,11 +922,11 @@
             <title>Αρχιπέλαγος 87.6</title>
         </track>
         <track>
-            <location>mms://live.istoikona.com/super</location>
+            <location>mmsh://live.istoikona.com/super</location>
             <title>Super Radio 104.7</title>
         </track>
         <track>
-            <location>mms://194.219.230.1:3690</location>
+            <location>mmsh://194.219.230.1:3690</location>
             <title>Mega Creta 103.1</title>
         </track>
         <track>
@@ -942,7 +942,7 @@
             <title>Μάνδρα Ράδιο</title>
         </track>
         <track>
-            <location>mms://a323.l6160932322.c61609.e.lm.akamaistream.net/D/323/61609/v0001/reflector:32322</location>
+            <location>mmsh://a323.l6160932322.c61609.e.lm.akamaistream.net/D/323/61609/v0001/reflector:32322</location>
             <title>Ζούγκλα Radio</title>
         </track>
         <track>
@@ -962,15 +962,15 @@
             <title>Ελληνικό Παραδοσιακό</title>
         </track>
         <track>
-            <location>mms://radio.istoikona.com/zenith</location>
+            <location>mmsh://radio.istoikona.com/zenith</location>
             <title>Zenith Radio 96.4</title>
         </track>
         <track>
-            <location>mms://a1235.l4434955234.c44349.g.lm.akamaistream.net/D/1235/44349/v0001/reflector:55234</location>
+            <location>mmsh://a1235.l4434955234.c44349.g.lm.akamaistream.net/D/1235/44349/v0001/reflector:55234</location>
             <title>Play 88.9</title>
         </track>
         <track>
-            <location>mms://broadcast.hol.gr/IonionFMU</location>
+            <location>mmsh://broadcast.hol.gr/IonionFMU</location>
             <title>Ιόνιον Fm Ηλείας 95.5</title>
         </track>
         <track>
@@ -1050,7 +1050,7 @@
             <title>Ρυθμός Fm 103.8</title>
         </track>
         <track>
-            <location>mms://radiofeeds1.mediabox.gr/kentrofm</location>
+            <location>mmsh://radiofeeds1.mediabox.gr/kentrofm</location>
             <title>Κέντρο Fm 98.2</title>
         </track>
         <track>
@@ -1086,7 +1086,7 @@
             <title>Ant1 Αιγαίου 105</title>
         </track>
         <track>
-            <location>mms://a1933.l3271921932.c32719.g.lm.akamaistream.net/D/1933/32719/v0001/reflector:21932</location>
+            <location>mmsh://a1933.l3271921932.c32719.g.lm.akamaistream.net/D/1933/32719/v0001/reflector:21932</location>
             <title>Τρίτο Πρόγραμμα Βραχέα</title>
         </track>
         <track>
@@ -1102,7 +1102,7 @@
             <title>Γλέντι Fm 101.1</title>
         </track>
         <track>
-            <location>mms://live.onestreaming.com/magiafm</location>
+            <location>mmsh://live.onestreaming.com/magiafm</location>
             <title>Μαγεία Fm 104.7</title>
         </track>
         <track>
@@ -1162,7 +1162,7 @@
             <title>Μουσικό Κανάλι 105.1</title>
         </track>
         <track>
-            <location>mms://golive.onestreaming.com/ydrogeios</location>
+            <location>mmsh://golive.onestreaming.com/ydrogeios</location>
             <title>Υδρόγειος 106.9</title>
         </track>
         <track>
@@ -1234,7 +1234,7 @@
             <title>Sfera 989</title>
         </track>
         <track>
-            <location>mms://starradio.no-ip.biz:2380</location>
+            <location>mmsh://starradio.no-ip.biz:2380</location>
             <title>Star Fm 106.7</title>
         </track>
         <track>
@@ -1310,11 +1310,11 @@
             <title>Κανάλι 20 107.5</title>
         </track>
         <track>
-            <location>mms://broadcast.hol.gr/cityfm</location>
+            <location>mmsh://broadcast.hol.gr/cityfm</location>
             <title>City Radio 103.3</title>
         </track>
         <track>
-            <location>mms://live.onestreaming.com/politia</location>
+            <location>mmsh://live.onestreaming.com/politia</location>
             <title>Πολιτεία 90.7</title>
         </track>
         <track>
@@ -1358,7 +1358,7 @@
             <title>Smart Fm 100.7</title>
         </track>
         <track>
-            <location>mms://broadcast.hol.gr/IonionFMU</location>
+            <location>mmsh://broadcast.hol.gr/IonionFMU</location>
             <title>Ionion Fm 95.8</title>
         </track>
         <track>
@@ -1366,7 +1366,7 @@
             <title>Horizon Fm 96.5</title>
         </track>
         <track>
-            <location>mms://broadcast.hol.gr/mojoradio</location>
+            <location>mmsh://broadcast.hol.gr/mojoradio</location>
             <title>Mojo Radio 107.7</title>
         </track>
         <track>
@@ -1378,7 +1378,7 @@
             <title>Kiss 100.6</title>
         </track>
         <track>
-            <location>mms://a1232.l3271935231.c32719.g.lm.akamaistream.net/D/1232/32719/v0001/reflector:35231</location>
+            <location>mmsh://a1232.l3271935231.c32719.g.lm.akamaistream.net/D/1232/32719/v0001/reflector:35231</location>
             <title>Kosmos 93.6</title>
         </track>
         <track>
@@ -1386,7 +1386,7 @@
             <title>Life Radio 91.6</title>
         </track>
         <track>
-            <location>mms://ant1.live24.gr/ant1</location>
+            <location>mmsh://ant1.live24.gr/ant1</location>
             <title>Ant1 97.2</title>
         </track>
         <track>
@@ -1394,7 +1394,7 @@
             <title>Gr4u</title>
         </track>
         <track>
-            <location>mms://a1318.l3271931317.c32719.g.lm.akamaistream.net/D/1318/32719/v0001/reflector:31317</location>
+            <location>mmsh://a1318.l3271931317.c32719.g.lm.akamaistream.net/D/1318/32719/v0001/reflector:31317</location>
             <title>Τρίτο  90.9</title>
         </track>
         <track>
@@ -1510,7 +1510,7 @@
             <title>Ελληνάδικο Fm</title>
         </track>
         <track>
-            <location>mms://radio.greekstream.net/ekrixi</location>
+            <location>mmsh://radio.greekstream.net/ekrixi</location>
             <title>Έκρηξη Fm 99.7</title>
         </track>
         <track>
@@ -1530,7 +1530,7 @@
             <title>Ράδιο ΔΕΘ 104.9</title>
         </track>
         <track>
-            <location>mms://a999.l3271920998.c32719.g.lm.akamaistream.net/D/999/32719/v0001/reflector:20998</location>
+            <location>mmsh://a999.l3271920998.c32719.g.lm.akamaistream.net/D/999/32719/v0001/reflector:20998</location>
             <title>Η Φωνή της Ελλάδας</title>
         </track>
         <track>
@@ -1562,11 +1562,11 @@
             <title>Vibe Fm 95.4</title>
         </track>
         <track>
-            <location>mms://a1782.l3271951781.c32719.g.lm.akamaistream.net/D/1782/32719/v0001/reflector:51781</location>
+            <location>mmsh://a1782.l3271951781.c32719.g.lm.akamaistream.net/D/1782/32719/v0001/reflector:51781</location>
             <title>Δεύτερο 103.7</title>
         </track>
         <track>
-            <location>mms://a1709.l3271943708.c32719.g.lm.akamaistream.net/D/1709/32719/v0001/reflector:43708</location>
+            <location>mmsh://a1709.l3271943708.c32719.g.lm.akamaistream.net/D/1709/32719/v0001/reflector:43708</location>
             <title>Net 105.8</title>
         </track>
         <track>
@@ -1574,7 +1574,7 @@
             <title>Dream Radio</title>
         </track>
         <track>
-            <location>mms://a1964.l3271953963.c32719.g.lm.akamaistream.net/D/1964/32719/v0001/reflector:53963</location>
+            <location>mmsh://a1964.l3271953963.c32719.g.lm.akamaistream.net/D/1964/32719/v0001/reflector:53963</location>
             <title>95.8 Fm</title>
         </track>
         <track>
@@ -1586,7 +1586,7 @@
             <title>Top Melody 104.9</title>
         </track>
         <track>
-            <location>mms://era.aegean.gr/era</location>
+            <location>mmsh://era.aegean.gr/era</location>
             <title>ΕΡΑ Β. Αιγαίου 103</title>
         </track>
         <track>
@@ -1606,7 +1606,7 @@
             <title>Radio Gold</title>
         </track>
         <track>
-            <location>mms://oasis.live24.gr/oasis8888</location>
+            <location>mmsh://oasis.live24.gr/oasis8888</location>
             <title>Όασις 88</title>
         </track>
         <track>
@@ -1614,7 +1614,7 @@
             <title>Βήμα Fm 99.5</title>
         </track>
         <track>
-            <location>mms://flash.live24.gr/flash5252</location>
+            <location>mmsh://flash.live24.gr/flash5252</location>
             <title>Flash 96</title>
         </track>
         <track>
@@ -1622,7 +1622,7 @@
             <title>River Fm 106.6</title>
         </track>
         <track>
-            <location>mms://a1251.l827423250.c8274.g.lm.akamaistream.net/D/1251/8274/v0001/reflector:23250</location>
+            <location>mmsh://a1251.l827423250.c8274.g.lm.akamaistream.net/D/1251/8274/v0001/reflector:23250</location>
             <title>Freedom</title>
         </track>
         <track>
@@ -1658,7 +1658,7 @@
             <title>Κρητόραμα 97.9</title>
         </track>
         <track>
-            <location>mms://a714.l649552713.c6495.g.lm.akamaistream.net/D/714/6495/v0001/reflector:52713</location>
+            <location>mmsh://a714.l649552713.c6495.g.lm.akamaistream.net/D/714/6495/v0001/reflector:52713</location>
             <title>Music 89.2</title>
         </track>
         <track>

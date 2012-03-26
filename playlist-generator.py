@@ -213,7 +213,8 @@ class PlaylistGenerator(object):
                 # DIRECT URL
                 print("Received audio content-type: {0} - using as direct url".format(ctype))
                 if mms:
-                    src = src.replace("http://", "mms://")
+                    # Use directly mmsh protocol
+                    src = src.replace("http://", "mmsh://")
                 self.add_to_radiodb(src, sid)
                 return True
             elif ctype in ("text/html", "application/x-shockwave-flash"):
