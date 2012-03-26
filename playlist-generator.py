@@ -184,10 +184,11 @@ class PlaylistGenerator(object):
             print("Error: Socket timeout: {0}".format(src))
             self.add_to_blacklist(sid)
             return False #skip
+        print("URL code: {0}".format(urlobject.getcode()))
         if not urlobject.getcode() == 200:
             print("ERROR: src http code not 200: {0} {1}".format(src, urlobject.getcode()))
-            self.add_to_blacklist(sid)
             exit()
+            self.add_to_blacklist(sid)
             return False #skip
         return urlobject
 
@@ -202,10 +203,12 @@ class PlaylistGenerator(object):
             if ctype == "video/x-ms-asf":
                 # Possible recursion detected
                 print("Content-type is: video/x-ms-asf - This should not happen (possible recursion detected).")
-                print("Check manually: Id: {0} - Link: {1}".format(sid, src))
-                exit()
-                #self.parse_asx_playlist(src, sid, directurl=True)
+                self.parse_asx_playlist(src, sid, url_contents=r.read())
                 return False
+            elif ctype == "audio/x-mpegurl":
+                print("Content-type audio/x-mpegurl - reparsing as m3u playlist")
+                self.parse_m3u_playlist(src, sid, url_contents=r.read())
+                return True
             elif "audio/" in ctype or ctype == "application/x-mms-framed":
                 # DIRECT URL
                 print("Received audio content-type: {0} - using as direct url".format(ctype))
@@ -245,12 +248,15 @@ class PlaylistGenerator(object):
         print("No content-type detected? TODO")
         exit()
 
-    def parse_asx_playlist(self, src, sid, directurl=False):
+    def parse_asx_playlist(self, src, sid, directurl=False, url_contents=''):
         """ Retrieve direct url from .asx playlist file. """
-        req = self.get_urlobject(src, sid)
-        if type(req) == types.BooleanType:
-            return False # error; skip
-        html = req.read()
+        if not url_contents:
+            req = self.get_urlobject(src, sid)
+            if type(req) == types.BooleanType:
+                return False # error; skip
+            html = req.read()
+        else:
+            html = url_contents
         rxurl = re.search(r'REF HREF\s?=\s?"(.*?)"', html, re.I+re.S)
         if not rxurl:
             if not directurl:
@@ -261,8 +267,8 @@ class PlaylistGenerator(object):
             else:
                 print("Error: Not .asx format, accepted as direct url: {0}".format(src))
                 print("TODO")
-                ctype = self.check_content_type(src, sid)
                 exit()
+                ctype = self.check_content_type(src, sid)
                 return True
         url = rxurl.group(1)
         # Strip whitespace
@@ -275,17 +281,20 @@ class PlaylistGenerator(object):
             self.check_content_type(url, sid)
         return True
 
-    def parse_m3u_playlist(self, src, sid):
+    def parse_m3u_playlist(self, src, sid, url_contents=''):
         """ Retrieve direct url from .m3u playlist file. """
-        req = self.get_urlobject(src, sid)
-        if type(req) == types.BooleanType:
-            return False # error; skip
-        text = req.read()
+        if not url_contents:
+            req = self.get_urlobject(src, sid)
+            if type(req) == types.BooleanType:
+                return False # error; skip
+            text = req.read()
+        else:
+            text = url_contents
         match = re.search("(http://[^\s]*)", text, re.M)
         if match:
             url = match.group(1)
             print ("Discovered url {0}".format(url))
-            ctype = self.check_content_type(src, sid)
+            ctype = self.check_content_type(url, sid)
         return True
 
     def add_to_blacklist(self, sid):
@@ -510,7 +519,7 @@ def go(service):
             "out_file_pls"    : '24radio.playlist.pls',
             "out_file_xspf"   : '24radio.playlist.xspf',
             "out_file_txt"    : '24radio.radiostations.txt',
-            "blacklist"       : ['778', '347', '342', '810', '811', '815', '718', '606', '619', '913', '298', '296', '295', '292', '293', '591', '592', '595', '594', '596', '196', '524', '525', '527', '528', '442', '440', '447', '445', '444', '108', '109', '102', '100', '101', '104', '907', '36', '35', '641', '645', '648', '432', '433', '334', '337', '336', '332', '558', '43', '98', '93', '92', '95', '94', '97', '742', '745', '556', '550', '553', '234', '237', '230', '231', '232', '233', '144', '143', '613', '611', '617', '149', '946', '944', '945', '943', '940', '768', '689', '517', '684', '683', '682', '133', '131', '136', '135', '495', '490', '491', '492', '21', '407', '406', '404', '403', '400', '409', '379', '378', '370', '427', '738', '88', '153', '376', '709', '705', '700', '701', '395', '394', '80', '398', '84', '85', '797', '794', '793', '798', '170', '585', '583', '581', '245', '241', '615', '518', '511', '1006', '512', '623', '620', '627', '178', '176', '174', '183', '654', '182', '181', '653', '184', '652', '188', '187', '947', '659', '568', '657', '326', '325', '328', '774', '204', '773', '208', '779', '76', '75', '74', '655', '358', '669', '666', '662', '660', '215', '692', '693', '690', '697', '699', '543', '540', '546', '990', '120', '128', '214', '415', '416', '413', '319', '313', '310', '317', '316', '314', '367', '952', '380', '381', '382', '383', '384', '385', '386', '387', '389', '786', '781', '782', '789', '578', '572', '571', '577', '576', '575', '574', '258', '69', '255', '603', '730', '735', '502', '633', '636', '637', '465', '461', '462', '164', '165', '167', '160', '963', '891', '896', '436', '356', '355', '802', '800', '804', '217', '762', '42', '760', '957', '321', '280', '285', '677', '671', '672', '673', '261', '260', '264', '1031', '58', '55', '57', '56', '51', '52', '537', '536', '63', '533', '152', '539', '201', '988', '50', '115', '116', '112', '118', '207', '429', '428', '918', '916', '303', '305', '306', '821', '601', '222', '150', '756', '758', '564', '567', '506', '229', '114', '720', '151', '609', '469', '959', '48', '49', '464', '508', '488', '487', '485', '483', '482', '481', '480', '473', '477', '475', '526', '904', '435', '1002', '246', '624', '180', '651', '206', '209', '667', '769', '694', '548', '785', '635', '1103', '282', '532', '302', '468', '954', '818', '449', '397', '83', '148', '248', '410', '496', '602'],
+            "blacklist"       : ['507', '818', '819', '347', '342', '343', '811', '815', '595', '718', '713', '710', '619', '427', '298', '296', '297', '295', '292', '293', '591', '592', '594', '596', '194', '606', '913', '196', '190', '271', '524', '525', '526', '527', '520', '528', '449', '442', '441', '440', '447', '445', '444', '108', '109', '102', '100', '101', '104', '907', '904', '36', '35', '641', '645', '88', '648', '435', '432', '433', '1002', '334', '337', '336', '332', '558', '98', '93', '92', '95', '94', '97', '153', '742', '745', '556', '550', '553', '234', '237', '230', '231', '232', '233', '144', '145', '143', '613', '611', '617', '946', '944', '945', '943', '940', '689', '684', '683', '682', '133', '131', '136', '135', '495', '490', '491', '492', '21', '407', '406', '404', '403', '400', '409', '934', '379', '378', '370', '376', '709', '705', '700', '701', '397', '395', '394', '83', '80', '398', '84', '85', '797', '794', '793', '798', '170', '585', '583', '581', '245', '246', '241', '148', '615', '248', '518', '511', '1006', '512', '517', '623', '620', '627', '624', '178', '176', '174', '198', '183', '654', '182', '180', '181', '653', '184', '652', '188', '187', '651', '947', '659', '568', '657', '326', '325', '328', '774', '204', '773', '206', '209', '208', '779', '76', '75', '74', '655', '358', '669', '667', '666', '662', '660', '215', '692', '693', '690', '697', '694', '699', '543', '540', '546', '548', '990', '120', '128', '214', '415', '416', '410', '413', '137', '319', '313', '310', '317', '316', '314', '496', '367', '952', '380', '381', '382', '383', '384', '385', '386', '387', '389', '785', '786', '781', '782', '789', '578', '572', '571', '577', '576', '575', '574', '258', '69', '255', '603', '730', '732', '735', '738', '502', '633', '635', '636', '637', '465', '461', '462', '164', '165', '167', '160', '963', '1103', '891', '896', '436', '356', '355', '802', '800', '804', '217', '768', '769', '762', '42', '760', '957', '321', '280', '282', '285', '677', '671', '672', '673', '261', '260', '264', '1031', '58', '55', '57', '56', '51', '52', '537', '536', '63', '533', '532', '539', '201', '988', '50', '115', '116', '112', '118', '207', '429', '428', '918', '916', '302', '303', '305', '306', '821', '954', '756', '758', '564', '567', '506', '229', '222', '220', '1026', '114', '1028', '720', '601', '602', '609', '469', '468', '959', '48', '49', '43', '464', '508', '488', '487', '485', '483', '482', '481', '480', '473', '477', '475'],
         }
     playlist = PlaylistGenerator(service_template)
     playlist.parse_links()
