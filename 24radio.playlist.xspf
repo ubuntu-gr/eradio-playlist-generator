@@ -18,6 +18,10 @@
             <title>Ράδιο Μωριάς 102.7</title>
         </track>
         <track>
+            <location>mms://live.onestreaming.com/magiafm</location>
+            <title>Μαγεία Fm 104.7</title>
+        </track>
+        <track>
             <location>http://live.isolservers.com:8400</location>
             <title>Σείριος Fm 95.8</title>
         </track>
@@ -966,10 +970,6 @@
             <title>Zenith Radio 96.4</title>
         </track>
         <track>
-            <location>mms://a1235.l4434955234.c44349.g.lm.akamaistream.net/D/1235/44349/v0001/reflector:55234</location>
-            <title>Play 88.9</title>
-        </track>
-        <track>
             <location>mms://broadcast.hol.gr/IonionFMU</location>
             <title>Ιόνιον Fm Ηλείας 95.5</title>
         </track>
@@ -1090,6 +1090,10 @@
             <title>Τρίτο Πρόγραμμα Βραχέα</title>
         </track>
         <track>
+            <location>http://shoutcast.24radio.gr:8072</location>
+            <title>34o River Party (Live)</title>
+        </track>
+        <track>
             <location>http://72.55.146.84:8020/</location>
             <title>Siera Fm 105.3</title>
         </track>
@@ -1102,8 +1106,8 @@
             <title>Γλέντι Fm 101.1</title>
         </track>
         <track>
-            <location>mms://live.onestreaming.com/magiafm</location>
-            <title>Μαγεία Fm 104.7</title>
+            <location>mms://a1235.l4434955234.c44349.g.lm.akamaistream.net/D/1235/44349/v0001/reflector:55234</location>
+            <title>Play 88.9</title>
         </track>
         <track>
             <location>http://91.121.143.17:8000/</location>
