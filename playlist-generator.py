@@ -28,9 +28,10 @@ import urllib2
 import sys
 import os.path
 import types
+import httplib
 
 from urlparse import urlparse
-from HTMLParser import HTMLParser
+#from HTMLParser import HTMLParser
 import socket
 socket.setdefaulttimeout(10.0)
 
@@ -60,23 +61,23 @@ class RadioDB():
         with open(self.db_file, "w") as f:
             pickle.dump(self.db, f)
 
-class Spider(HTMLParser):
-    def __init__(self, url):
-        HTMLParser.__init__(self)
-        self.src = ""
-        req = urllib.urlopen(url)
-        self.feed(req.read())
+#class Spider(HTMLParser):
+    #def __init__(self, url):
+        #HTMLParser.__init__(self)
+        #self.src = ""
+        #req = urllib.urlopen(url)
+        #self.feed(req.read())
 
-    def handle_starttag(self, tag, attrs):
-        if tag == "iframe":
-            for attr in attrs:
-                if attr[0] == "src" and attr[1].startswith("playerX"):
-                    self.src = (attr[1], "playerx")
-        elif tag == "embed":
-            for attr in attrs:
-                if attr[0] == "src" and attr[1].startswith("http://www.e-radio.gr/asx"):
-                    self.src = (attr[1], "asx")
-        # self.src[0] => link, self.src[1] => type
+    #def handle_starttag(self, tag, attrs):
+        #if tag == "iframe":
+            #for attr in attrs:
+                #if attr[0] == "src" and attr[1].startswith("playerX"):
+                    #self.src = (attr[1], "playerx")
+        #elif tag == "embed":
+            #for attr in attrs:
+                #if attr[0] == "src" and attr[1].startswith("http://www.e-radio.gr/asx"):
+                    #self.src = (attr[1], "asx")
+        ## self.src[0] => link, self.src[1] => type
 
 class PlaylistGenerator(object):
     def __init__(self, service_template):
@@ -184,11 +185,22 @@ class PlaylistGenerator(object):
             print("Error: Socket timeout: {0}".format(src))
             self.add_to_blacklist(sid)
             return False #skip
+        except httplib.BadStatusLine:
+            # TODO - Is there a way to ignore badstatusline?
+            print("Error: Invalid url: {0} -- CHECK MANUALLY (probably rtmp or ICY protocol)".format(src))
+            self.add_to_blacklist(sid)
+            exit()
+            #return False #skip
+        except httplib.InvalidURL:
+            print("Error: Invalid url: {0}".format(src))
+            self.add_to_blacklist(sid)
+            exit()
+            return False #skip
         print("URL code: {0}".format(urlobject.getcode()))
         if not urlobject.getcode() == 200:
             print("ERROR: src http code not 200: {0} {1}".format(src, urlobject.getcode()))
-            exit()
             self.add_to_blacklist(sid)
+            exit()
             return False #skip
         return urlobject
 
@@ -223,10 +235,10 @@ class PlaylistGenerator(object):
                 self.add_to_blacklist(sid)
                 return False #skip
             else:
-                # UNKNOWN - FAIL
-                print("Error: unknown content-type: {0}".format(ctype))
-                exit()
+                # UNKNOWN/HTML? - FAIL
+                print("Error: unknown content-type: {0} -- {1} -- CHECK MANUALLY".format(ctype, src))
                 self.add_to_blacklist(sid)
+                exit()
                 return False #skip
         else:
             #Shoutcast / ICY Protocol - no http headers
@@ -246,7 +258,7 @@ class PlaylistGenerator(object):
                     print("Error: Failed to find content-type: {0}".format(src))
                     self.add_to_blacklist(sid)
                     break
-        print("No content-type detected? TODO")
+        print("No content-type detected? CHECK MANUALLY")
         exit()
 
     def parse_asx_playlist(self, src, sid, directurl=False, url_contents=''):
@@ -326,7 +338,7 @@ class PlaylistGenerator(object):
             print("Contacting {0}".format(url_station))
             urlo = self.get_urlobject(url_station, sid)
             text = urlo.read()
-            m = re.search(r'<EMBED .*?src="([^"]*)"', text, re.S)
+            m = re.search(r'<EMBED .*?src=["\']([^"\']*)["\']', text, re.S)
             if not m:
                 print("ERROR: Could not match src, station dict: {0} link: {1}".format(self.stations[sid], url_station))
                 self.add_to_blacklist(sid)
@@ -351,7 +363,7 @@ class PlaylistGenerator(object):
                 self.parse_m3u_playlist(src, sid)
                 continue
             if path.endswith(".pls"):
-                print("src is pls - TODO: fixme")
+                print("src is pls - TODO")
                 exit()
             if path.endswith(".asx") or path.endswith(".wax"):
                 # LINK IS .asx (playlist)
@@ -371,72 +383,125 @@ class PlaylistGenerator(object):
                 'weblink': u''
             }
         """
-        url_main = "http://www.e-radio.gr/player/player.asp?sid="
-        rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&stitle=(?P<stitle>[^&]*)&pt=(?P<pt>[^&]*)&weblink=(?P<weblink>[^&]*)"
-        rx = re.compile(rxstr)
-        for (index, sid) in enumerate(self.stations.keys()):
-            print("Processing sid: {0}".format(sid))
+        url_main = "http://www.e-radio.gr/player/mini.asp?c=000&pt=1&ppt=2&sid="
+
+        for d in self.stations.itervalues():
+            t = d['title'].encode("utf-8")
+            sid = d['id'].encode("utf-8")
+            print("\n\n=== Title: {0} Link: {1}{2}".format(t, url_main, sid))
             if self.stations[sid].has_key('url'):
-                print("Skipping radio id {0} ({1}), already in cache".format(sid, self.stations[sid]["cn"]))
+                print("Skipping radio id {0} ({1}), already in cache: {2}".format(sid, t, d['url']))
                 continue #skip
             if sid in self.blacklist:
                 print("Skipping radio id {0}, blacklisted".format(sid))
                 continue #skip
+            
             url_station = url_main + sid
-            spider = Spider(url_station)
-            src = spider.src
-            print("src: {0}".format(src))
-            if src:
-                match = rx.search(src[0])
-            else:
-                print("Error! src is empty: {0} station dict: {1} link: {2}".format(src, self.stations[sid], url_station))
-                #sys.exit(-1)
-                self.blacklist.append(sid)
-                print("Appended to blacklist and skipped: {0}".format(self.blacklist))
+            print("Contacting {0}".format(url_station))
+            urlo = self.get_urlobject(url_station, sid)
+            text = urlo.read()
+            m = re.search(r'<embed .*?src=["\']([^"\']*)["\']', text, re.S)
+            if not m:
+                print("ERROR: Could not match src, station dict: {0} link: {1}".format(self.stations[sid], url_station))
+                self.add_to_blacklist(sid)
                 continue
-            if match:
-                d = match.groupdict()
-                self.stations[sid]['cn'] = d['cn']
-                if d['weblink']: # If external weblink
-                    unquoted = urllib.unquote(d['weblink'])
-                    if (unquoted[0:3] != "http"):
-                        unquoted = "http://" + unquoted
-                    print("Found external weblink {0} - using as url".format(unquoted))
-                    self.stations[sid]['weblink'] = unquoted
-                    self.stations[sid]['url'] = unquoted
-                else:
-                    cnlink = 'http://www.e-radio.gr/asx/{0}.asx'.format(d['cn'])
-                    print("Did not find external weblink, trying {0}".format(cnlink))
-                    req = urllib.urlopen(cnlink)
-                    html = req.read()
-                    rxurl = re.search(r'REF HREF = "(.*?)"', html, re.I)
-                    if rxurl:
-                        self.stations[sid]['url'] = rxurl.group(1)
-                if not self.stations[sid]['url']:
-                    print("Couldn't find url for this station: {0} {1}".format(src, self.stations[sid]))
-                    sys.exit(-1)
-                print("station dict: {0} asx: http://www.e-radio.gr/asx/{1}.asx mms: {2} ".format(d, d["cn"], self.stations[sid]["url"]))
-            elif src[1] == "asx":
-                d = { 'sid': sid, 'cn': u'', 'weblink': u'' }
-                self.stations[sid]['cn'] = d['cn']
-                req = urllib.urlopen(src[0])
-                html = req.read()
-                url = re.search(r'REF HREF = "(.*?)"', html, re.I)
-                if url:
-                    self.stations[sid]['url'] = url.group(1)
-                else:
-                    print("Couldn't find url for this station: {0} {1}".format(src[0], self.stations[sid]))
-                    sys.exit(-1)
-                print("station dict (default): {0} asx: {1} mms: {2} ".format(d, src[0], self.stations[sid]["url"]))
-            else:
-                print("Error parsing radio station link (Could not match regex). src: {0} station dict: {1} link: {2}".format(src, self.stations[sid], url_station))
-                sys.exit(-1)
+            src = m.group(1)
+            if not "://" in src:
+                src = "http://" + src #Assume http://
+            print("src: {0}".format(src))
+            urlp = urlparse(src)
+            #strip whitespace characters
+            src = src.rstrip()
+            path = urlp.path.rstrip()
+            #>>> urlparse.urlparse("http://www.example.com/test.asx?wow=1&boo=2")
+            #>>> ParseResult(scheme='http', netloc='www.example.com', path='/test.asx', params='', query='wow=1&boo=2', fragment='')
+            if urlp.scheme == "mms":
+                print("Direct mms url detected.")
+                src = src.replace("mms://", "http://")
+                ctype = self.check_content_type(src, sid, mms=True)
+                continue
+            if path.endswith(".m3u"):
+                print("src is m3u, looking for direct url")
+                self.parse_m3u_playlist(src, sid)
+                continue
+            if path.endswith(".pls"):
+                print("src is pls - TODO")
+                exit()
+            if path.endswith(".asx") or path.endswith(".wax"):
+                # LINK IS .asx (playlist)
+                print("src is asx, looking for direct url")
+                self.parse_asx_playlist(src, sid)
+                continue
+            print("src not .asx, .pls, .m3u - checking content type")
+            # Check content type and add or blacklist (or fail)
+            ctype = self.check_content_type(src, sid)
+        
+        #rxstr = r"playerX.asp\?sID=(?P<sid>\d+)&cn=(?P<cn>[^&]*)&stitle=(?P<stitle>[^&]*)&pt=(?P<pt>[^&]*)&weblink=(?P<weblink>[^&]*)"
+        #rx = re.compile(rxstr)
+        #for (index, sid) in enumerate(self.stations.keys()):
+            #print("Processing sid: {0}".format(sid))
+            #if self.stations[sid].has_key('url'):
+                #print("Skipping radio id {0} ({1}), already in cache".format(sid, self.stations[sid]["cn"]))
+                #continue #skip
+            #if sid in self.blacklist:
+                #print("Skipping radio id {0}, blacklisted".format(sid))
+                #continue #skip
+                
+            #url_station = url_main + sid
+            #spider = Spider(url_station)
+            #src = spider.src
+            #print("src: {0}".format(src))
+            #if src:
+                #match = rx.search(src[0])
+            #else:
+                #print("Error! src is empty: {0} station dict: {1} link: {2}".format(src, self.stations[sid], url_station))
+                ##sys.exit(-1)
+                #self.blacklist.append(sid)
+                #print("Appended to blacklist and skipped: {0}".format(self.blacklist))
+                #continue
+            #if match:
+                #d = match.groupdict()
+                #self.stations[sid]['cn'] = d['cn']
+                #if d['weblink']: # If external weblink
+                    #unquoted = urllib.unquote(d['weblink'])
+                    #if (unquoted[0:3] != "http"):
+                        #unquoted = "http://" + unquoted
+                    #print("Found external weblink {0} - using as url".format(unquoted))
+                    #self.stations[sid]['weblink'] = unquoted
+                    #self.stations[sid]['url'] = unquoted
+                #else:
+                    #cnlink = 'http://www.e-radio.gr/asx/{0}.asx'.format(d['cn'])
+                    #print("Did not find external weblink, trying {0}".format(cnlink))
+                    #req = urllib.urlopen(cnlink)
+                    #html = req.read()
+                    #rxurl = re.search(r'REF HREF = "(.*?)"', html, re.I)
+                    #if rxurl:
+                        #self.stations[sid]['url'] = rxurl.group(1)
+                #if not self.stations[sid].has_key('url') or not self.stations[sid]['url']:
+                    #print("Couldn't find url for this station: {0} {1}".format(src, self.stations[sid]))
+                    #sys.exit(-1)
+                #print("station dict: {0} asx: http://www.e-radio.gr/asx/{1}.asx mms: {2} ".format(d, d["cn"], self.stations[sid]["url"]))
+            #elif src[1] == "asx":
+                #d = { 'sid': sid, 'cn': u'', 'weblink': u'' }
+                #self.stations[sid]['cn'] = d['cn']
+                #req = urllib.urlopen(src[0])
+                #html = req.read()
+                #url = re.search(r'REF HREF = "(.*?)"', html, re.I)
+                #if url:
+                    #self.stations[sid]['url'] = url.group(1)
+                #else:
+                    #print("Couldn't find url for this station: {0} {1}".format(src[0], self.stations[sid]))
+                    #sys.exit(-1)
+                #print("station dict (default): {0} asx: {1} mms: {2} ".format(d, src[0], self.stations[sid]["url"]))
+            #else:
+                #print("Error parsing radio station link (Could not match regex). src: {0} station dict: {1} link: {2}".format(src, self.stations[sid], url_station))
+                #sys.exit(-1)
 
-            self.radiodb.dump() # Sync database
+            #self.radiodb.dump() # Sync database
 
-            # Για 3 σταθμούς μόνο, για τη δοκιμή μας.
-            #if index >= TESTCOUNT:
-                #break
+            ## Για 3 σταθμούς μόνο, για τη δοκιμή μας.
+            ##if index >= TESTCOUNT:
+                ##break
 
     def make_txt(self):
         """ Simple format, suitable for Greek Ubuntu ISO's radiostations.txt
@@ -461,18 +526,18 @@ class PlaylistGenerator(object):
         """ Create a *.pls file - http://en.wikipedia.org/wiki/PLS_%28file_format%29
         """
         ns = 0
-        s = u"[playlist]\n"
+        s = u'[playlist]\n'
         for (index, sid) in enumerate(self.stations.keys()):
             if not self.stations[sid].has_key('url'):
                 continue #skip
             ns += 1
-            s += "File%d=%s\n" % (index, self.stations[sid]['url'])
-            s += "Title%d=%s\n" % (index, self.stations[sid]['title'])
-            s += "Length%d=-1\n" % (ns)
+            s += u"File%d=%s\n" % (index, self.stations[sid]['url'])
+            s += u"Title%d=%s\n" % (index, self.stations[sid]['title'])
+            s += u"Length%d=-1\n" % (ns)
             #if index >= TESTCOUNT:
                 #break
-        s += "NumberofEntries=%d\n" % ns
-        s += "Version=2\n"
+        s += u"NumberofEntries=%d\n" % ns
+        s += u"Version=2\n"
         with codecs.open(self.service_template["out_file_pls"], mode="w", encoding="utf-8") as f:
             f.write(s)
 
@@ -480,19 +545,19 @@ class PlaylistGenerator(object):
         """ Create a *.xspf file - http://www.xspf.org
         """
         s = u'<?xml version="1.0" encoding="UTF-8"?>\n'
-        s += '<playlist version="1" xmlns="http://xspf.org/ns/0/">\n'
-        s += '    <trackList>\n'
+        s += u'<playlist version="1" xmlns="http://xspf.org/ns/0/">\n'
+        s += u'    <trackList>\n'
         for (index, sid) in enumerate(self.stations.keys()):
             if not self.stations[sid].has_key('url'):
                 continue #skip
-            s += "        <track>\n"
-            s += "            <location>%s</location>\n" % self.stations[sid]['url'].replace("&", "&amp;")
-            s += "            <title>%s</title>\n" % self.stations[sid]['title']
-            s += "        </track>\n"
+            s += u"        <track>\n"
+            s += u"            <location>%s</location>\n" % self.stations[sid]['url'].replace("&", "&amp;")
+            s += u"            <title>%s</title>\n" % self.stations[sid]['title']
+            s += u"        </track>\n"
             #if index >= TESTCOUNT:
                 #break
-        s += "    </trackList>\n"
-        s += "</playlist>\n"
+        s += u"    </trackList>\n"
+        s += u"</playlist>\n"
 
         with codecs.open(self.service_template["out_file_xspf"], mode="w", encoding="utf-8") as f:
             f.write(s)
@@ -508,8 +573,9 @@ def go(service):
             "out_file_pls"    : 'eradio.playlist.pls',
             "out_file_xspf"   : 'eradio.playlist.xspf',
             "out_file_txt"    : 'eradio.radiostations.txt',
-            "blacklist"      : ['1758', '1887', '1715', '801', '307'],
+            "blacklist"      : ['1702', '292', '270', '279', '521', '102', '528', '449', '1239', '103', '100', '107', '104', '902', '430', '1908', '1907', '1904', '1903', '1900', '850', '852', '819', '859', '6', '98', '1991', '1990', '1995', '1994', '743', '744', '745', '747', '232', '233', '1196', '1758', '1750', '140', '1889', '1884', '1882', '1881', '1880', '947', '689', '684', '683', '1818', '137', '490', '21', '2019', '401', '2014', '931', '2016', '1955', '1953', '1952', '1958', '829', '824', '827', '395', '83', '796', '792', '1879', '1136', '243', '249', '518', '170', '511', '514', '459', '451', '456', '1872', '178', '1878', '972', '180', '652', '1918', '1911', '1917', '1916', '861', '2023', '883', '929', '1966', '1962', '771', '207', '77', '73', '72', '1769', '1762', '1767', '1764', '1765', '216', '660', '769', '693', '694', '695', '1780', '1466', '124', '1829', '1828', '1824', '1821', '1820', '1822', '417', '498', '923', '316', '1922', '1923', '1926', '446', '1831', '781', '788', '62', '730', '733', '503', '465', '460', '1861', '2015', '1862', '961', '962', '408', '678', '1817', '876', '1893', '890', '1977', '1976', '1975', '1973', '1972', '951', '355', '808', '801', '953', '358', '210', '1783', '1777', '1776', '1771', '1075', '1779', '1778', '679', '677', '269', '55', '56', '538', '988', '981', '117', '111', '1859', '1850', '1853', '1854', '1856', '919', '1932', '1935', '1939', '138', '847', '843', '1987', '1981', '752', '224', '222', '950', '505', '725', '728', '1165', '1207', '1896', '1890', '473', '954', '1112', '2003', '1713', '488', '1807', '1801', '1860', '1808', '2006', '2007', '2004'],
         }
+        #TODO: Exceptions (ICY without http headers): 222, 1112
     elif service == "24radio":
         service_template = {
             # 24radio.gr template
@@ -533,6 +599,6 @@ def go(service):
     print("Blacklist: {0}".format(playlist.blacklist))
 
 if __name__ == '__main__':
-    #go("eradio")
-    go("24radio")
+    go("eradio")
+    #go("24radio")
 
