@@ -2,10 +2,6 @@
 <playlist version="1" xmlns="http://xspf.org/ns/0/">
     <trackList>
         <track>
-            <location>http://s1.onweb.gr:8402</location>
-            <title>Xanthi DeeJay 90,6</title>
-        </track>
-        <track>
             <location>http://50.7.243.50:8082</location>
             <title>Radio Patata </title>
         </track>
@@ -678,6 +674,10 @@
             <title>Σταθμός </title>
         </track>
         <track>
+            <location>http://85.17.238.96:8050</location>
+            <title>Radio Art 1 </title>
+        </track>
+        <track>
             <location>http://149.5.240.22/WR-GR-WR71</location>
             <title>Energy Athens 88,6</title>
         </track>
@@ -1034,10 +1034,6 @@
             <title>Radio 1 101</title>
         </track>
         <track>
-            <location>http://live.onestreaming.com/apopsi</location>
-            <title>Ράδιο Αποψη </title>
-        </track>
-        <track>
             <location>http://groove.wavestreamer.com:4396</location>
             <title>99,6 Radio </title>
         </track>
@@ -1350,8 +1346,8 @@
             <title>Rockarolla Radio </title>
         </track>
         <track>
-            <location>http://85.17.238.96:8050</location>
-            <title>Radio Art 1 </title>
+            <location>http://live.onestreaming.com/apopsi</location>
+            <title>Ράδιο Αποψη </title>
         </track>
         <track>
             <location>http://85.17.30.90:8044</location>

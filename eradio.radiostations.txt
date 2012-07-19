@@ -1,8 +1,7 @@
 # List of radio stations in Rhythmbox and Banshee
 #
 # Format: arbitrarily many lines with
-# URL; Genre; Namehttp://s1.onweb.gr:8402; N/A; Xanthi DeeJay 90,6
-http://50.7.243.50:8082; N/A; Radio Patata 
+# URL; Genre; Namehttp://50.7.243.50:8082; N/A; Radio Patata 
 http://188.40.131.14:8004; N/A; Space FM 107
 http://176.9.35.49:9875; N/A; DJ Vasilis WebRadio 
 http://78.129.142.4:8264; N/A; Kapsimi WR 
@@ -170,6 +169,7 @@ http://178.32.72.194:8060/rthes; N/A; Ράδιο Θεσσαλονίκη 94,5
 http://diesi.live24.gr/diesi1013; N/A; Δίεση 101,3
 http://golive.onestreaming.com/thepopfm; N/A; The Pop Fm 98,6
 http://sc2.greekstream.net:4008; N/A; Σταθμός 
+http://85.17.238.96:8050; N/A; Radio Art 1 
 http://149.5.240.22/WR-GR-WR71; N/A; Energy Athens 88,6
 http://live.waveradio.gr:8000/listen; N/A; Wave Radio 
 http://hotsoft.ws:8086/talosfm?.wma; N/A; Τάλως FM 88,6
@@ -259,7 +259,6 @@ http://broadcast.hol.gr/kanali20; N/A; Κανάλι 20 107,5
 http://s1.onweb.gr:8022; N/A; Ανατολικός Fm 95,8
 http://208.43.121.133:8850; N/A; Paradise Radio 104,6
 http://101fm.dyndns.tv:8002; N/A; Radio 1 101
-http://live.onestreaming.com/apopsi; N/A; Ράδιο Αποψη 
 http://groove.wavestreamer.com:4396; N/A; 99,6 Radio 
 http://live.onestreaming.com/lampsifmcrete; N/A; Lampsi Fm 92,9
 http://208.43.115.44:9578; N/A; Astros Radio 
@@ -338,7 +337,7 @@ http://hotfm.live24.gr/shock; N/A; Hot Fm
 http://eco.onestreaming.com:8300; N/A; Ερωτιάρης 
 http://85.17.238.96:8060; N/A; Radio Art 2 
 http://5.9.15.53:9996; N/A; Rockarolla Radio 
-http://85.17.238.96:8050; N/A; Radio Art 1 
+http://live.onestreaming.com/apopsi; N/A; Ράδιο Αποψη 
 http://85.17.30.90:8044; N/A; Star 95,7
 http://eco.onestreaming.com:8105; N/A; Original 94,4
 http://eco.onestreaming.com:8014/live; N/A; Bleep Radio 
