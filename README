@@ -6,3 +6,17 @@ http://forum.ubuntu-gr.org/viewtopic.php?f=6&t=15885
 Το e-radio playlist generator διαβάζει μια λίστα από διαδικτυακά ραδιόφωνα
 και παράγει ένα αρχείο .pls (ή .xspf), που μπορούμε να το προσθέσουμε στο
 πρόγραμμα αναπαραγωγής μουσικής που χρησιμοποιούμε (όπως Rhythmbox, Banshee, κτλ).
+
+==Οδηγίες==
+
+Πάρτε ένα από τα παραπάνω αρχεία και εισάγετέ τα στο πρόγραμμα αναπαραγωγής μουσικής.
+Παραδείγματα τέτοιων προγραμμάτων είναι **Totem**, **VLC** και **Rhythmbox**.
+
+==Λίστες αναπαραγωγής (playlists)==
+
+* 24radio
+ * Μορφή XSPF: https://raw.github.com/ubuntu-gr/eradio-playlist-generator/master/24radio.playlist.xspf
+ * Μορφή PLS: https://raw.github.com/ubuntu-gr/eradio-playlist-generator/master/24radio.playlist.pls
+* e-radio
+ * Μορφή XSPF: https://raw.github.com/ubuntu-gr/eradio-playlist-generator/master/eradio.playlist.xspf
+ * Μορφή PLS: https://raw.github.com/ubuntu-gr/eradio-playlist-generator/master/eradio.playlist.pls

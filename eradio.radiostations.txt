@@ -169,7 +169,6 @@ http://178.32.72.194:8060/rthes; N/A; Ράδιο Θεσσαλονίκη 94,5
 http://diesi.live24.gr/diesi1013; N/A; Δίεση 101,3
 http://golive.onestreaming.com/thepopfm; N/A; The Pop Fm 98,6
 http://sc2.greekstream.net:4008; N/A; Σταθμός 
-http://85.17.238.96:8050; N/A; Radio Art 1 
 http://149.5.240.22/WR-GR-WR71; N/A; Energy Athens 88,6
 http://live.waveradio.gr:8000/listen; N/A; Wave Radio 
 http://hotsoft.ws:8086/talosfm?.wma; N/A; Τάλως FM 88,6
@@ -259,6 +258,7 @@ http://broadcast.hol.gr/kanali20; N/A; Κανάλι 20 107,5
 http://s1.onweb.gr:8022; N/A; Ανατολικός Fm 95,8
 http://208.43.121.133:8850; N/A; Paradise Radio 104,6
 http://101fm.dyndns.tv:8002; N/A; Radio 1 101
+http://live.onestreaming.com/apopsi; N/A; Ράδιο Αποψη 
 http://groove.wavestreamer.com:4396; N/A; 99,6 Radio 
 http://live.onestreaming.com/lampsifmcrete; N/A; Lampsi Fm 92,9
 http://208.43.115.44:9578; N/A; Astros Radio 
@@ -337,7 +337,7 @@ http://hotfm.live24.gr/shock; N/A; Hot Fm
 http://eco.onestreaming.com:8300; N/A; Ερωτιάρης 
 http://85.17.238.96:8060; N/A; Radio Art 2 
 http://5.9.15.53:9996; N/A; Rockarolla Radio 
-http://live.onestreaming.com/apopsi; N/A; Ράδιο Αποψη 
+http://85.17.238.96:8050; N/A; Radio Art 1 
 http://85.17.30.90:8044; N/A; Star 95,7
 http://eco.onestreaming.com:8105; N/A; Original 94,4
 http://eco.onestreaming.com:8014/live; N/A; Bleep Radio 
@@ -405,7 +405,6 @@ http://live.radioalphaomega.com:4006; N/A; Ράδιο Α-Ω 90,4
 http://s6.onweb.gr:8056; N/A; Ράδιο Φάρος 92,7
 http://live.duth.gr:8000/omorfipoli-hifi; N/A; Omorfi Poli 89,9
 http://eco.onestreaming.com:8272; N/A; Fly Radio 89,7
-http://m1.onweb.gr/1055rock; N/A; 1055 Rock 105,5
 http://streamx1.greekradios.gr:8000; N/A; Metropolis 95,5
 http://a1232.l3271935231.c32719.g.lm.akamaistream.net/D/1232/32719/v0001/reflector:35231; N/A; ΕΡΑ Κόσμος 93,6
 http://a1367.l3271923366.c32719.g.lm.akamaistream.net/D/1367/32719/v0001/reflector:23366; N/A; ΕΡΑ Φιλία 

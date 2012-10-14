@@ -674,10 +674,6 @@
             <title>Σταθμός </title>
         </track>
         <track>
-            <location>http://85.17.238.96:8050</location>
-            <title>Radio Art 1 </title>
-        </track>
-        <track>
             <location>http://149.5.240.22/WR-GR-WR71</location>
             <title>Energy Athens 88,6</title>
         </track>
@@ -1034,6 +1030,10 @@
             <title>Radio 1 101</title>
         </track>
         <track>
+            <location>http://live.onestreaming.com/apopsi</location>
+            <title>Ράδιο Αποψη </title>
+        </track>
+        <track>
             <location>http://groove.wavestreamer.com:4396</location>
             <title>99,6 Radio </title>
         </track>
@@ -1346,8 +1346,8 @@
             <title>Rockarolla Radio </title>
         </track>
         <track>
-            <location>http://live.onestreaming.com/apopsi</location>
-            <title>Ράδιο Αποψη </title>
+            <location>http://85.17.238.96:8050</location>
+            <title>Radio Art 1 </title>
         </track>
         <track>
             <location>http://85.17.30.90:8044</location>
@@ -1616,10 +1616,6 @@
         <track>
             <location>http://eco.onestreaming.com:8272</location>
             <title>Fly Radio 89,7</title>
-        </track>
-        <track>
-            <location>http://m1.onweb.gr/1055rock</location>
-            <title>1055 Rock 105,5</title>
         </track>
         <track>
             <location>http://streamx1.greekradios.gr:8000</location>

@@ -1,4 +1,4 @@
-var mediadata=[
+var mediadata = [
 { mediatitle: "Άλφα Radio 96", city: "ΣΕΡΡΕΣ", mediaid: 1197, logo: "/logos/gr/mini/nologo.gif" }, 
 { mediatitle: "Άρης Fm 92,8", city: "ΘΕΣΣΑΛΟΝΙΚΗ", mediaid: 279, logo: "/logos/gr/mini/arisfm.gif" }, 
 { mediatitle: "1055 Rock 105,5", city: "ΘΕΣΣΑΛΟΝΙΚΗ", mediaid: 116, logo: "/logos/gr/mini/rock1055.gif" }, 
