@@ -18,10 +18,6 @@
             <title>Ράδιο Μωριάς 102.7</title>
         </track>
         <track>
-            <location>mms://live.onestreaming.com/magiafm</location>
-            <title>Μαγεία Fm 104.7</title>
-        </track>
-        <track>
             <location>http://live.isolservers.com:8400</location>
             <title>Σείριος Fm 95.8</title>
         </track>
@@ -336,6 +332,10 @@
         <track>
             <location>http://188.40.131.14:6004/</location>
             <title>Cosi Radio</title>
+        </track>
+        <track>
+            <location>http://shoutcast.24radio.gr:8006/</location>
+            <title>Ράδιο Κανίβαλος</title>
         </track>
         <track>
             <location>mms://a1758.l3271933757.c32719.g.lm.akamaistream.net/D/1758/32719/v0001/reflector:33757</location>
@@ -734,6 +734,10 @@
             <title>Έντεχνος Fm</title>
         </track>
         <track>
+            <location>http://shoutcast.24radio.gr:8072</location>
+            <title>Antennes 93.6</title>
+        </track>
+        <track>
             <location>http://shoutcast.24radio.gr:8000</location>
             <title>Hybrid Radio 94.9</title>
         </track>
@@ -832,6 +836,10 @@
         <track>
             <location>http://85.17.177.77:8010</location>
             <title>Go Radio</title>
+        </track>
+        <track>
+            <location>http://shoutcast.24radio.gr:8018</location>
+            <title>Γαλαξίας 91.1</title>
         </track>
         <track>
             <location>http://s6.onweb.gr:8018/</location>
@@ -964,6 +972,10 @@
         <track>
             <location>mms://radio.istoikona.com/zenith</location>
             <title>Zenith Radio 96.4</title>
+        </track>
+        <track>
+            <location>mms://a1235.l4434955234.c44349.g.lm.akamaistream.net/D/1235/44349/v0001/reflector:55234</location>
+            <title>Play 88.9</title>
         </track>
         <track>
             <location>mms://broadcast.hol.gr/IonionFMU</location>
@@ -1102,8 +1114,8 @@
             <title>Γλέντι Fm 101.1</title>
         </track>
         <track>
-            <location>mms://a1235.l4434955234.c44349.g.lm.akamaistream.net/D/1235/44349/v0001/reflector:55234</location>
-            <title>Play 88.9</title>
+            <location>mms://live.onestreaming.com/magiafm</location>
+            <title>Μαγεία Fm 104.7</title>
         </track>
         <track>
             <location>http://91.121.143.17:8000/</location>
@@ -1120,6 +1132,10 @@
         <track>
             <location>http://live.onestreaming.com/mesogios</location>
             <title>Μεσόγειος Fm 105.4</title>
+        </track>
+        <track>
+            <location>http://live.piratefm.net:8000</location>
+            <title>Pirate Radio 91</title>
         </track>
         <track>
             <location>http://216.66.84.2:9108</location>
